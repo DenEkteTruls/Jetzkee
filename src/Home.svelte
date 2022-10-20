@@ -1,8 +1,12 @@
 <script>
     import PlayerBar from './components/PlayerBar.svelte';
-    import Board from './components/Board.svelte'
+    import Board from './components/Board.svelte';
 
     var username = sessionStorage.getItem("username");
+
+    if(username == undefined || username == '') {
+        window.location.href = "/";
+    }
 
     let board = [
         {'title': 'Enere', 'v1': 0, 'v2': 0},
@@ -27,24 +31,22 @@
 
 <div class="container">
     <div class="left">
-        <div class="left-conte"></div>
-            <PlayerBar name='Bot'/>
-            <Board/>
-            <PlayerBar name='{username}'/>
-        </div>
+        <PlayerBar name='Bot' bot=true/>
+        <Board/>
+        <PlayerBar name={username}/>
     </div>
     <div class="right">
         <div class="board">
             <table>
                 <tr>
                     <th></th> 
-                    <th>{username}</th> 
+                    <th>{username}</th>
                     <th>Bot</th>
                 </tr>
                 {#each board as nice}
                     <tr>
                         <td>{nice.title}</td>
-                        <td>{nice.v1}</td>
+                        <td class="not-clickable">{nice.v1}</td>
                         <td>{nice.v2}</td>
                     </tr>
                 {/each}
@@ -75,8 +77,9 @@
     .board {
         background-color: white;
         width: 70%;
-        max-width: 400px !important;
+        max-width: 600px !important;
         height: 80%;
+        max-height: 1200px !important;
         border-radius: 30px;
         box-shadow: 0px 0px 20px 3px lightgrey;
 
@@ -94,13 +97,20 @@
     }
 
     .left {
-        display: flex;
-        justify-content: center;
+        margin: auto auto;
+        display: grid;
+        grid-template-rows: 20% 60% 20%;
+        justify-items: center;
         align-items: center;
+        width: 90%;
+        height: 95%;
     }
 
-    .left-conte {
-        display: grid;
-        grid-template-rows: 20% 60% 20%;   
+    .clickable {
+        cursor: pointer;
+    }
+
+    .not-clickable {
+        cursor: default;
     }
 </style>

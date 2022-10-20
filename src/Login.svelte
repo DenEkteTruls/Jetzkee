@@ -69,7 +69,7 @@
     }
 
     .field:hover, .field:active {
-        outline: 3px solid var(--yellow);
+        outline: 2px solid var(--orange);
     }
 
     #btn {
@@ -80,10 +80,11 @@
         border: none;
         border-radius: 15px;
         background-color: var(--yellow);
-        color: white;
         font-family: 'Russo One';
         cursor: pointer;
         transition: all .2s ease-in-out;
+        outline: none;
+        color: white;
     }
     
     #btn:hover {
