@@ -1,9 +1,10 @@
 <script>
     export let name;
     export let bot;
+    export let engine;
 
     function roll() {
-        console.log("rolling...");
+        engine.roll_dize();
     }
 </script>
 
@@ -21,7 +22,11 @@
     </div>
     <div class="button-container">
         {#if bot} <button/> {:else}
-            <button on:click={() => {roll()}}>ROLL</button>
+            {#if engine.tries_left > 0}
+                <button id="button" on:click={() => {roll()}}>KAST</button>
+            {:else}
+                <button class="not-cliackable" on:click={() => {roll()}}>KAST</button>
+            {/if}
         {/if}
     </div>
 </div>
@@ -75,7 +80,17 @@
         background-color: var(--yellow);
         font-family: var(--font);
         font-size: 16px;
+        transition: all .1s ease-in-out;
+    }
+
+    #button:hover {
+        background-color: var(--orange);
         cursor: pointer;
+    }
+
+    .not-cliackable {
+        background-color: rgba(163, 163, 163, 0.199) !important;
+        cursor: default !important;
     }
 
     #username {

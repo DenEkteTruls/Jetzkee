@@ -11,7 +11,7 @@
 <div class="container">
     <div class="left">
         <div class="form">
-            <input type="text" id="username" class="field" placeholder="Username"/>
+            <input type="text" maxlength="12" id="username" class="field" placeholder="Username"/>
             <button id="btn" on:click={() => start()}>Start</button>
         </div>
     </div>

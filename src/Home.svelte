@@ -1,39 +1,63 @@
 <script>
+    import {Engine} from './components/terning';
+
     import PlayerBar from './components/PlayerBar.svelte';
     import Board from './components/Board.svelte';
+    import Overlay from './components/Overlay.svelte';
+    import { bitOrDependencies, sum } from 'mathjs';
 
+    $: engine = new Engine(5);
     var username = sessionStorage.getItem("username");
+
+
+    // Skulle gjerne funnet en løsning på dette
+    setInterval(() => {
+        engine = engine;
+    }, 50);
+
 
     if(username == undefined || username == '') {
         window.location.href = "/";
     }
 
-    let board = [
-        {'title': 'Enere', 'v1': 0, 'v2': 0},
-        {'title': 'Toere', 'v1': 0, 'v2': 0},
-        {'title': 'Treere', 'v1': 0, 'v2': 0},
-        {'title': 'Firere', 'v1': 0, 'v2': 0},
-        {'title': 'Femere', 'v1': 0, 'v2': 0},
-        {'title': 'Seksere', 'v1': 0, 'v2': 0},
-        {'title': 'Sum', 'v1': 0, 'v2': 0},
-        {'title': 'Bonus', 'v1': 0, 'v2': 0},
-        {'title': 'Liten Straight', 'v1': 0, 'v2': 0},
-        {'title': 'Stor Straight', 'v1': 0, 'v2': 0},
-        {'title': 'Hus', 'v1': 0, 'v2': 0},
-        {'title': 'Sjanse', 'v1': 0, 'v2': 0},
-        {'title': 'Yatzy', 'v1': 0, 'v2': 0},
-        {'title': 'Totalsum', 'v1': 0, 'v2': 0}
+    $: board = [
+        {'title': 'Enere', 'v1': engine.points_detail[0], 'pot': engine.calculate_points(1), 'v2': 0},
+        {'title': 'Toere', 'v1': engine.points_detail[1], 'pot': engine.calculate_points(2),'v2': 0},
+        {'title': 'Treere', 'v1': engine.points_detail[2], 'pot': engine.calculate_points(3), 'v2': 0},
+        {'title': 'Firere', 'v1': engine.points_detail[3], 'pot': engine.calculate_points(4), 'v2': 0},
+        {'title': 'Femere', 'v1': engine.points_detail[4], 'pot': engine.calculate_points(5), 'v2': 0},
+        {'title': 'Seksere', 'v1': engine.points_detail[5], 'pot': engine.calculate_points(6), 'v2': 0},
+        {'title': 'Liten Straight', 'v1': engine.points_detail[6], 'pot': engine.calculate_points('liten'),  'v2': 0},
+        {'title': 'Stor Straight', 'v1': engine.points_detail[7], 'pot': engine.calculate_points('stor'),  'v2': 0},
+        {'title': 'Hus', 'v1': engine.points_detail[8], 'pot': engine.calculate_points('hus'),  'v2': 0},
+        {'title': 'Sjanse', 'v1': engine.points_detail[9], 'pot': engine.calculate_points('sjanse'),  'v2': 0},
+        {'title': 'Yatzy', 'v1': engine.points_detail[10], 'pot': engine.calculate_points('yatzy'),  'v2': 0},
+        {'title': 'Totalsum', 'v1': engine.points, 'pot': 0, 'v2': 0}
     ];
+
+    function clicked(title, pot) {
+        for(let i = 0; i < board.length; i++) {
+            if(board[i].title == title) {
+                engine.points_detail[i] += pot;
+                engine.points += pot;
+            }
+        }
+        engine.new_round();
+    }
+
+    function ferdig() {
+        engine.done = true;
+    }
 </script>
 
 
-
+{#if engine.done} <Overlay {engine}/> {/if}
 
 <div class="container">
     <div class="left">
-        <PlayerBar name='Bot' bot=true/>
-        <Board/>
-        <PlayerBar name={username}/>
+        <PlayerBar name='Bot' bot=true {engine}/>
+        <Board engine={engine}/>
+        <PlayerBar name={username} {engine}/>
     </div>
     <div class="right">
         <div class="board">
@@ -46,12 +70,17 @@
                 {#each board as nice}
                     <tr>
                         <td>{nice.title}</td>
-                        <td class="not-clickable">{nice.v1}</td>
+                        {#if nice.pot && nice.v1 == 0}
+                            <td class="clickable" id={nice.title} on:click={() => {clicked(nice.title, nice.pot)}}>{nice.v1} + {nice.pot}</td>
+                        {:else}
+                            <td class="not-clickable">{nice.v1}</td>
+                        {/if}
                         <td>{nice.v2}</td>
                     </tr>
                 {/each}
             </table>
         </div>
+        <button on:click="{() => {ferdig()}}"id="done-button">FERDIG</button>
     </div>
 </div>
 
@@ -65,6 +94,7 @@
         display: grid;
         grid-template-columns: 50% 50%;
         background-color: var(--darkgreen);
+        min-width: 920px !important;
     }
 
     .right {
@@ -72,15 +102,16 @@
         display: flex;
         justify-content: center;
         align-items: center;
+        flex-direction: column;
     }
 
     .board {
         background-color: white;
         width: 70%;
-        max-width: 600px !important;
-        height: 80%;
-        max-height: 1200px !important;
-        border-radius: 30px;
+        max-width: 600px;
+        height: 72%;
+        max-height: 1200px;
+        border-radius: 20px;
         box-shadow: 0px 0px 20px 3px lightgrey;
 
         display: grid;
@@ -112,5 +143,24 @@
 
     .not-clickable {
         cursor: default;
+    }
+
+    #done-button {
+        width: calc(70% + 40px);
+        max-width: 600px;
+        height: 50px;
+        background-color: var(--yellow);
+        border: none;
+        border-radius: 15px;
+        color: rgb(0, 0, 0);
+        font-size: 18px;
+        font-family: var(--font);
+        margin-top: 20px;
+        transition: all .1s ease-in-out;
+    }
+
+    #done-button:hover {
+        background-color: var(--orange);
+        cursor: pointer;
     }
 </style>
