@@ -1716,6 +1716,10 @@ var app = (function () {
         }
 
         new_round() {
+            if(this.points_detail.indexOf(0) == -1) {
+                this.done = true;
+            }
+
             if(this.done) {
                 this.dizes = [];
                 this.chosen_list = [];
@@ -1830,7 +1834,7 @@ var app = (function () {
     const file$4 = "src\\components\\PlayerBar.svelte";
 
     // (16:8) {:else}
-    function create_else_block_1$1(ctx) {
+    function create_else_block_1(ctx) {
     	let img;
     	let img_src_value;
 
@@ -1852,7 +1856,7 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block_1$1.name,
+    		id: create_else_block_1.name,
     		type: "else",
     		source: "(16:8) {:else}",
     		ctx
@@ -2016,7 +2020,7 @@ var app = (function () {
 
     	function select_block_type(ctx, dirty) {
     		if (/*bot*/ ctx[1]) return create_if_block_2$1;
-    		return create_else_block_1$1;
+    		return create_else_block_1;
     	}
 
     	let current_block_type = select_block_type(ctx);
@@ -7104,14 +7108,14 @@ var app = (function () {
       _createTyped2 = typedFunction.create;
       return typedFunction;
     };
-    var dependencies$6 = ['?BigNumber', '?Complex', '?DenseMatrix', '?Fraction'];
+    var dependencies$a = ['?BigNumber', '?Complex', '?DenseMatrix', '?Fraction'];
 
     /**
      * Factory function for creating a new typed instance
      * @param {Object} dependencies   Object with data types like Complex and BigNumber
      * @returns {Function}
      */
-    var createTyped = /* #__PURE__ */factory('typed', dependencies$6, function createTyped(_ref) {
+    var createTyped = /* #__PURE__ */factory('typed', dependencies$a, function createTyped(_ref) {
       var {
         BigNumber,
         Complex,
@@ -12359,9 +12363,9 @@ var app = (function () {
     LN10 = new Decimal(LN10);
     PI = new Decimal(PI);
 
-    var name$5 = 'BigNumber';
-    var dependencies$5 = ['?on', 'config'];
-    var createBigNumberClass = /* #__PURE__ */factory(name$5, dependencies$5, _ref => {
+    var name$9 = 'BigNumber';
+    var dependencies$9 = ['?on', 'config'];
+    var createBigNumberClass = /* #__PURE__ */factory(name$9, dependencies$9, _ref => {
       var {
         on,
         config
@@ -13825,9 +13829,9 @@ var app = (function () {
 
     var Complex$1 = /*@__PURE__*/getDefaultExportFromCjs(complex);
 
-    var name$4 = 'Complex';
-    var dependencies$4 = [];
-    var createComplexClass = /* #__PURE__ */factory(name$4, dependencies$4, () => {
+    var name$8 = 'Complex';
+    var dependencies$8 = [];
+    var createComplexClass = /* #__PURE__ */factory(name$8, dependencies$8, () => {
       /**
        * Attach type information
        */
@@ -14900,9 +14904,9 @@ var app = (function () {
 
     var Fraction$1 = /*@__PURE__*/getDefaultExportFromCjs(fraction);
 
-    var name$3 = 'Fraction';
-    var dependencies$3 = [];
-    var createFractionClass = /* #__PURE__ */factory(name$3, dependencies$3, () => {
+    var name$7 = 'Fraction';
+    var dependencies$7 = [];
+    var createFractionClass = /* #__PURE__ */factory(name$7, dependencies$7, () => {
       /**
        * Attach type information
        */
@@ -14940,9 +14944,9 @@ var app = (function () {
       isClass: true
     });
 
-    var name$2 = 'Matrix';
-    var dependencies$2 = [];
-    var createMatrixClass = /* #__PURE__ */factory(name$2, dependencies$2, () => {
+    var name$6 = 'Matrix';
+    var dependencies$6 = [];
+    var createMatrixClass = /* #__PURE__ */factory(name$6, dependencies$6, () => {
       /**
        * @constructor Matrix
        *
@@ -15197,9 +15201,9 @@ var app = (function () {
       }, -1);
     }
 
-    var name$1 = 'DenseMatrix';
-    var dependencies$1 = ['Matrix'];
-    var createDenseMatrixClass = /* #__PURE__ */factory(name$1, dependencies$1, _ref => {
+    var name$5 = 'DenseMatrix';
+    var dependencies$5 = ['Matrix'];
+    var createDenseMatrixClass = /* #__PURE__ */factory(name$5, dependencies$5, _ref => {
       var {
         Matrix
       } = _ref;
@@ -16162,9 +16166,300 @@ var app = (function () {
     }
     notNumber.signature = n1;
 
-    var name = 'not';
-    var dependencies = ['typed'];
-    var createNot = /* #__PURE__ */factory(name, dependencies, _ref => {
+    var name$4 = 'number';
+    var dependencies$4 = ['typed'];
+
+    /**
+     * Separates the radix, integer part, and fractional part of a non decimal number string
+     * @param {string} input string to parse
+     * @returns {object} the parts of the string or null if not a valid input
+     */
+    function getNonDecimalNumberParts(input) {
+      var nonDecimalWithRadixMatch = input.match(/(0[box])([0-9a-fA-F]*)\.([0-9a-fA-F]*)/);
+      if (nonDecimalWithRadixMatch) {
+        var radix = {
+          '0b': 2,
+          '0o': 8,
+          '0x': 16
+        }[nonDecimalWithRadixMatch[1]];
+        var integerPart = nonDecimalWithRadixMatch[2];
+        var fractionalPart = nonDecimalWithRadixMatch[3];
+        return {
+          input,
+          radix,
+          integerPart,
+          fractionalPart
+        };
+      } else {
+        return null;
+      }
+    }
+
+    /**
+     * Makes a number from a radix, and integer part, and a fractional part
+     * @param {parts} [x] parts of the number string (from getNonDecimalNumberParts)
+     * @returns {number} the number
+     */
+    function makeNumberFromNonDecimalParts(parts) {
+      var n = parseInt(parts.integerPart, parts.radix);
+      var f = 0;
+      for (var i = 0; i < parts.fractionalPart.length; i++) {
+        var digitValue = parseInt(parts.fractionalPart[i], parts.radix);
+        f += digitValue / Math.pow(parts.radix, i + 1);
+      }
+      var result = n + f;
+      if (isNaN(result)) {
+        throw new SyntaxError('String "' + parts.input + '" is no valid number');
+      }
+      return result;
+    }
+    var createNumber = /* #__PURE__ */factory(name$4, dependencies$4, _ref => {
+      var {
+        typed
+      } = _ref;
+      /**
+       * Create a number or convert a string, boolean, or unit to a number.
+       * When value is a matrix, all elements will be converted to number.
+       *
+       * Syntax:
+       *
+       *    math.number(value)
+       *    math.number(unit, valuelessUnit)
+       *
+       * Examples:
+       *
+       *    math.number(2)                         // returns number 2
+       *    math.number('7.2')                     // returns number 7.2
+       *    math.number(true)                      // returns number 1
+       *    math.number([true, false, true, true]) // returns [1, 0, 1, 1]
+       *    math.number(math.unit('52cm'), 'm')    // returns 0.52
+       *
+       * See also:
+       *
+       *    bignumber, boolean, complex, index, matrix, string, unit
+       *
+       * @param {string | number | BigNumber | Fraction | boolean | Array | Matrix | Unit | null} [value]  Value to be converted
+       * @param {Unit | string} [valuelessUnit] A valueless unit, used to convert a unit to a number
+       * @return {number | Array | Matrix} The created number
+       */
+      var number = typed('number', {
+        '': function _() {
+          return 0;
+        },
+        number: function number(x) {
+          return x;
+        },
+        string: function string(x) {
+          if (x === 'NaN') return NaN;
+          var nonDecimalNumberParts = getNonDecimalNumberParts(x);
+          if (nonDecimalNumberParts) {
+            return makeNumberFromNonDecimalParts(nonDecimalNumberParts);
+          }
+          var size = 0;
+          var wordSizeSuffixMatch = x.match(/(0[box][0-9a-fA-F]*)i([0-9]*)/);
+          if (wordSizeSuffixMatch) {
+            // x includes a size suffix like 0xffffi32, so we extract
+            // the suffix and remove it from x
+            size = Number(wordSizeSuffixMatch[2]);
+            x = wordSizeSuffixMatch[1];
+          }
+          var num = Number(x);
+          if (isNaN(num)) {
+            throw new SyntaxError('String "' + x + '" is no valid number');
+          }
+          if (wordSizeSuffixMatch) {
+            // x is a signed bin, oct, or hex literal
+            // num is the value of string x if x is interpreted as unsigned
+            if (num > 2 ** size - 1) {
+              // literal is too large for size suffix
+              throw new SyntaxError("String \"".concat(x, "\" is out of range"));
+            }
+            // check if the bit at index size - 1 is set and if so do the twos complement
+            if (num >= 2 ** (size - 1)) {
+              num = num - 2 ** size;
+            }
+          }
+          return num;
+        },
+        BigNumber: function BigNumber(x) {
+          return x.toNumber();
+        },
+        Fraction: function Fraction(x) {
+          return x.valueOf();
+        },
+        Unit: function Unit(x) {
+          throw new Error('Second argument with valueless unit expected');
+        },
+        null: function _null(x) {
+          return 0;
+        },
+        'Unit, string | Unit': function UnitStringUnit(unit, valuelessUnit) {
+          return unit.toNumber(valuelessUnit);
+        },
+        'Array | Matrix': typed.referToSelf(self => x => deepMap(x, self))
+      });
+
+      // reviver function to parse a JSON object like:
+      //
+      //     {"mathjs":"number","value":"2.3"}
+      //
+      // into a number 2.3
+      number.fromJSON = function (json) {
+        return parseFloat(json.value);
+      };
+      return number;
+    });
+
+    var name$3 = 'bignumber';
+    var dependencies$3 = ['typed', 'BigNumber'];
+    var createBignumber = /* #__PURE__ */factory(name$3, dependencies$3, _ref => {
+      var {
+        typed,
+        BigNumber
+      } = _ref;
+      /**
+       * Create a BigNumber, which can store numbers with arbitrary precision.
+       * When a matrix is provided, all elements will be converted to BigNumber.
+       *
+       * Syntax:
+       *
+       *    math.bignumber(x)
+       *
+       * Examples:
+       *
+       *    0.1 + 0.2                                  // returns number 0.30000000000000004
+       *    math.bignumber(0.1) + math.bignumber(0.2)  // returns BigNumber 0.3
+       *
+       *
+       *    7.2e500                                    // returns number Infinity
+       *    math.bignumber('7.2e500')                  // returns BigNumber 7.2e500
+       *
+       * See also:
+       *
+       *    boolean, complex, index, matrix, string, unit
+       *
+       * @param {number | string | Fraction | BigNumber | Array | Matrix | boolean | null} [value]  Value for the big number,
+       *                                                    0 by default.
+       * @returns {BigNumber} The created bignumber
+       */
+      return typed('bignumber', {
+        '': function _() {
+          return new BigNumber(0);
+        },
+        number: function number(x) {
+          // convert to string to prevent errors in case of >15 digits
+          return new BigNumber(x + '');
+        },
+        string: function string(x) {
+          var wordSizeSuffixMatch = x.match(/(0[box][0-9a-fA-F]*)i([0-9]*)/);
+          if (wordSizeSuffixMatch) {
+            // x has a word size suffix
+            var size = wordSizeSuffixMatch[2];
+            var n = BigNumber(wordSizeSuffixMatch[1]);
+            var twoPowSize = new BigNumber(2).pow(Number(size));
+            if (n.gt(twoPowSize.sub(1))) {
+              throw new SyntaxError("String \"".concat(x, "\" is out of range"));
+            }
+            var twoPowSizeSubOne = new BigNumber(2).pow(Number(size) - 1);
+            if (n.gte(twoPowSizeSubOne)) {
+              return n.sub(twoPowSize);
+            } else {
+              return n;
+            }
+          }
+          return new BigNumber(x);
+        },
+        BigNumber: function BigNumber(x) {
+          // we assume a BigNumber is immutable
+          return x;
+        },
+        Fraction: function Fraction(x) {
+          return new BigNumber(x.n).div(x.d).times(x.s);
+        },
+        null: function _null(x) {
+          return new BigNumber(0);
+        },
+        'Array | Matrix': typed.referToSelf(self => x => deepMap(x, self))
+      });
+    });
+
+    var name$2 = 'fraction';
+    var dependencies$2 = ['typed', 'Fraction'];
+    var createFraction = /* #__PURE__ */factory(name$2, dependencies$2, _ref => {
+      var {
+        typed,
+        Fraction
+      } = _ref;
+      /**
+       * Create a fraction or convert a value to a fraction.
+       *
+       * With one numeric argument, produces the closest rational approximation to the
+       * input.
+       * With two arguments, the first is the numerator and the second is the denominator,
+       * and creates the corresponding fraction. Both numerator and denominator must be
+       * integers.
+       * With one object argument, looks for the integer numerator as the value of property
+       * 'n' and the integer denominator as the value of property 'd'.
+       * With a matrix argument, creates a matrix of the same shape with entries
+       * converted into fractions.
+       *
+       * Syntax:
+       *     math.fraction(value)
+       *     math.fraction(numerator, denominator)
+       *     math.fraction({n: numerator, d: denominator})
+       *     math.fraction(matrix: Array | Matrix)
+       *
+       * Examples:
+       *
+       *     math.fraction(6.283)             // returns Fraction 6283/1000
+       *     math.fraction(1, 3)              // returns Fraction 1/3
+       *     math.fraction('2/3')             // returns Fraction 2/3
+       *     math.fraction({n: 2, d: 3})      // returns Fraction 2/3
+       *     math.fraction([0.2, 0.25, 1.25]) // returns Array [1/5, 1/4, 5/4]
+       *     math.fraction(4, 5.1)            // throws Error: Parameters must be integer
+       *
+       * See also:
+       *
+       *    bignumber, number, string, unit
+       *
+       * @param {number | string | Fraction | BigNumber | Array | Matrix} [args]
+       *            Arguments specifying the value, or numerator and denominator of
+       *            the fraction
+       * @return {Fraction | Array | Matrix} Returns a fraction
+       */
+      return typed('fraction', {
+        number: function number(x) {
+          if (!isFinite(x) || isNaN(x)) {
+            throw new Error(x + ' cannot be represented as a fraction');
+          }
+          return new Fraction(x);
+        },
+        string: function string(x) {
+          return new Fraction(x);
+        },
+        'number, number': function numberNumber(numerator, denominator) {
+          return new Fraction(numerator, denominator);
+        },
+        null: function _null(x) {
+          return new Fraction(0);
+        },
+        BigNumber: function BigNumber(x) {
+          return new Fraction(x.toString());
+        },
+        Fraction: function Fraction(x) {
+          return x; // fractions are immutable
+        },
+
+        Object: function Object(x) {
+          return new Fraction(x);
+        },
+        'Array | Matrix': typed.referToSelf(self => x => deepMap(x, self))
+      });
+    });
+
+    var name$1 = 'not';
+    var dependencies$1 = ['typed'];
+    var createNot = /* #__PURE__ */factory(name$1, dependencies$1, _ref => {
       var {
         typed
       } = _ref;
@@ -16193,7 +16488,7 @@ var app = (function () {
        * @return {boolean | Array | Matrix}
        *            Returns true when input is a zero or empty value.
        */
-      return typed(name, {
+      return typed(name$1, {
         'null | undefined': () => true,
         number: notNumber,
         Complex: function Complex(x) {
@@ -16205,6 +16500,84 @@ var app = (function () {
         Unit: typed.referToSelf(self => x => typed.find(self, x.valueType())(x.value)),
         'Array | Matrix': typed.referToSelf(self => x => deepMap(x, self))
       });
+    });
+
+    function noBignumber() {
+      throw new Error('No "bignumber" implementation available');
+    }
+    function noFraction() {
+      throw new Error('No "fraction" implementation available');
+    }
+
+    var name = 'numeric';
+    var dependencies = ['number', '?bignumber', '?fraction'];
+    var createNumeric = /* #__PURE__ */factory(name, dependencies, _ref => {
+      var {
+        number: _number,
+        bignumber,
+        fraction
+      } = _ref;
+      var validInputTypes = {
+        string: true,
+        number: true,
+        BigNumber: true,
+        Fraction: true
+      };
+
+      // Load the conversion functions for each output type
+      var validOutputTypes = {
+        number: x => _number(x),
+        BigNumber: bignumber ? x => bignumber(x) : noBignumber,
+        Fraction: fraction ? x => fraction(x) : noFraction
+      };
+
+      /**
+       * Convert a numeric input to a specific numeric type: number, BigNumber, or Fraction.
+       *
+       * Syntax:
+       *
+       *    math.numeric(x)
+       *
+       * Examples:
+       *
+       *    math.numeric('4')                           // returns 4
+       *    math.numeric('4', 'number')                 // returns 4
+       *    math.numeric('4', 'BigNumber')              // returns BigNumber 4
+       *    math.numeric('4', 'Fraction')               // returns Fraction 4
+       *    math.numeric(4, 'Fraction')                 // returns Fraction 4
+       *    math.numeric(math.fraction(2, 5), 'number') // returns 0.4
+       *
+       * See also:
+       *
+       *    number, fraction, bignumber, string, format
+       *
+       * @param {string | number | BigNumber | Fraction } value
+       *              A numeric value or a string containing a numeric value
+       * @param {string} outputType
+       *              Desired numeric output type.
+       *              Available values: 'number', 'BigNumber', or 'Fraction'
+       * @return {number | BigNumber | Fraction}
+       *              Returns an instance of the numeric in the requested type
+       */
+      return function numeric(value) {
+        var outputType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'number';
+        var check = arguments.length > 2 ? arguments[2] : undefined;
+        if (check !== undefined) {
+          throw new SyntaxError('numeric() takes one or two arguments');
+        }
+        var inputType = typeOf(value);
+        if (!(inputType in validInputTypes)) {
+          throw new TypeError('Cannot convert ' + value + ' of type "' + inputType + '"; valid input types are ' + Object.keys(validInputTypes).join(', '));
+        }
+        if (!(outputType in validOutputTypes)) {
+          throw new TypeError('Cannot convert ' + value + ' to type "' + outputType + '"; valid output types are ' + Object.keys(validOutputTypes).join(', '));
+        }
+        if (outputType === inputType) {
+          return value;
+        } else {
+          return validOutputTypes[outputType](value);
+        }
+      };
     });
 
     /**
@@ -16230,12 +16603,105 @@ var app = (function () {
       typed
     });
 
+    /**
+     * THIS FILE IS AUTO-GENERATED
+     * DON'T MAKE CHANGES HERE
+     */
+    var BigNumberDependencies = {
+      createBigNumberClass
+    };
+
+    /**
+     * THIS FILE IS AUTO-GENERATED
+     * DON'T MAKE CHANGES HERE
+     */
+    var ComplexDependencies = {
+      createComplexClass
+    };
+
+    /**
+     * THIS FILE IS AUTO-GENERATED
+     * DON'T MAKE CHANGES HERE
+     */
+    var MatrixDependencies = {
+      createMatrixClass
+    };
+
+    /**
+     * THIS FILE IS AUTO-GENERATED
+     * DON'T MAKE CHANGES HERE
+     */
+    var DenseMatrixDependencies = {
+      MatrixDependencies,
+      createDenseMatrixClass
+    };
+
+    /**
+     * THIS FILE IS AUTO-GENERATED
+     * DON'T MAKE CHANGES HERE
+     */
+    var FractionDependencies = {
+      createFractionClass
+    };
+
+    /**
+     * THIS FILE IS AUTO-GENERATED
+     * DON'T MAKE CHANGES HERE
+     */
+    var typedDependencies = {
+      BigNumberDependencies,
+      ComplexDependencies,
+      DenseMatrixDependencies,
+      FractionDependencies,
+      createTyped
+    };
+
+    /**
+     * THIS FILE IS AUTO-GENERATED
+     * DON'T MAKE CHANGES HERE
+     */
+    var bignumberDependencies = {
+      BigNumberDependencies,
+      typedDependencies,
+      createBignumber
+    };
+
+    /**
+     * THIS FILE IS AUTO-GENERATED
+     * DON'T MAKE CHANGES HERE
+     */
+    var fractionDependencies = {
+      FractionDependencies,
+      typedDependencies,
+      createFraction
+    };
+
+    /**
+     * THIS FILE IS AUTO-GENERATED
+     * DON'T MAKE CHANGES HERE
+     */
+    var numberDependencies = {
+      typedDependencies,
+      createNumber
+    };
+
+    /**
+     * THIS FILE IS AUTO-GENERATED
+     * DON'T MAKE CHANGES HERE
+     */
+    var numericDependencies = {
+      bignumberDependencies,
+      fractionDependencies,
+      numberDependencies,
+      createNumeric
+    };
+
     /* src\Home.svelte generated by Svelte v3.52.0 */
     const file$1 = "src\\Home.svelte";
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[8] = list[i];
+    	child_ctx[7] = list[i];
     	return child_ctx;
     }
 
@@ -16287,135 +16753,28 @@ var app = (function () {
     	return block;
     }
 
-    // (92:24) {:else}
-    function create_else_block_1(ctx) {
-    	let td;
-    	let t_value = /*nice*/ ctx[8].v1 + "";
-    	let t;
-
-    	const block = {
-    		c: function create() {
-    			td = element("td");
-    			t = text(t_value);
-    			attr_dev(td, "class", "not-clickable svelte-6mxglo");
-    			add_location(td, file$1, 92, 28, 3645);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, td, anchor);
-    			append_dev(td, t);
-    		},
-    		p: function update(ctx, dirty) {
-    			if (dirty & /*board*/ 2 && t_value !== (t_value = /*nice*/ ctx[8].v1 + "")) set_data_dev(t, t_value);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(td);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_else_block_1.name,
-    		type: "else",
-    		source: "(92:24) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (86:24) {#if nice.v1 == 0}
-    function create_if_block(ctx) {
-    	let if_block_anchor;
-
-    	function select_block_type_1(ctx, dirty) {
-    		if (/*nice*/ ctx[8].pot) return create_if_block_1;
-    		return create_else_block;
-    	}
-
-    	let current_block_type = select_block_type_1(ctx);
-    	let if_block = current_block_type(ctx);
-
-    	const block = {
-    		c: function create() {
-    			if_block.c();
-    			if_block_anchor = empty();
-    		},
-    		m: function mount(target, anchor) {
-    			if_block.m(target, anchor);
-    			insert_dev(target, if_block_anchor, anchor);
-    		},
-    		p: function update(ctx, dirty) {
-    			if (current_block_type === (current_block_type = select_block_type_1(ctx)) && if_block) {
-    				if_block.p(ctx, dirty);
-    			} else {
-    				if_block.d(1);
-    				if_block = current_block_type(ctx);
-
-    				if (if_block) {
-    					if_block.c();
-    					if_block.m(if_block_anchor.parentNode, if_block_anchor);
-    				}
-    			}
-    		},
-    		d: function destroy(detaching) {
-    			if_block.d(detaching);
-    			if (detaching) detach_dev(if_block_anchor);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block.name,
-    		type: "if",
-    		source: "(86:24) {#if nice.v1 == 0}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (89:28) {:else}
+    // (88:24) {:else}
     function create_else_block(ctx) {
     	let td;
-    	let t_value = /*nice*/ ctx[8].v1 + "";
+    	let t_value = /*nice*/ ctx[7].v1 + "";
     	let t;
-    	let td_id_value;
-    	let mounted;
-    	let dispose;
-
-    	function click_handler_1() {
-    		return /*click_handler_1*/ ctx[6](/*nice*/ ctx[8]);
-    	}
 
     	const block = {
     		c: function create() {
     			td = element("td");
     			t = text(t_value);
-    			attr_dev(td, "class", "clickable svelte-6mxglo");
-    			attr_dev(td, "id", td_id_value = /*nice*/ ctx[8].title);
-    			add_location(td, file$1, 89, 32, 3446);
+    			attr_dev(td, "class", "not-clickable svelte-1gjl6jy");
+    			add_location(td, file$1, 88, 28, 3458);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, td, anchor);
     			append_dev(td, t);
-
-    			if (!mounted) {
-    				dispose = listen_dev(td, "click", click_handler_1, false, false, false);
-    				mounted = true;
-    			}
     		},
-    		p: function update(new_ctx, dirty) {
-    			ctx = new_ctx;
-    			if (dirty & /*board*/ 2 && t_value !== (t_value = /*nice*/ ctx[8].v1 + "")) set_data_dev(t, t_value);
-
-    			if (dirty & /*board*/ 2 && td_id_value !== (td_id_value = /*nice*/ ctx[8].title)) {
-    				attr_dev(td, "id", td_id_value);
-    			}
+    		p: function update(ctx, dirty) {
+    			if (dirty & /*board*/ 2 && t_value !== (t_value = /*nice*/ ctx[7].v1 + "")) set_data_dev(t, t_value);
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(td);
-    			mounted = false;
-    			dispose();
     		}
     	};
 
@@ -16423,44 +16782,43 @@ var app = (function () {
     		block,
     		id: create_else_block.name,
     		type: "else",
-    		source: "(89:28) {:else}",
+    		source: "(88:24) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (87:28) {#if nice.pot}
-    function create_if_block_1(ctx) {
+    // (86:24) {#if nice.v1 == 0 && nice.title != 'Totalsum'}
+    function create_if_block(ctx) {
     	let td;
-    	let t0_value = /*nice*/ ctx[8].v1 + "";
+    	let t0_value = /*nice*/ ctx[7].v1 + "";
     	let t0;
     	let t1;
-    	let t2_value = /*nice*/ ctx[8].pot + "";
-    	let t2;
     	let td_id_value;
     	let mounted;
     	let dispose;
+    	let if_block = /*nice*/ ctx[7].pot && create_if_block_1(ctx);
 
     	function click_handler() {
-    		return /*click_handler*/ ctx[5](/*nice*/ ctx[8]);
+    		return /*click_handler*/ ctx[5](/*nice*/ ctx[7]);
     	}
 
     	const block = {
     		c: function create() {
     			td = element("td");
     			t0 = text(t0_value);
-    			t1 = text(" + ");
-    			t2 = text(t2_value);
-    			attr_dev(td, "class", "clickable svelte-6mxglo");
-    			attr_dev(td, "id", td_id_value = /*nice*/ ctx[8].title);
-    			add_location(td, file$1, 87, 32, 3261);
+    			t1 = space();
+    			if (if_block) if_block.c();
+    			attr_dev(td, "class", "clickable svelte-1gjl6jy");
+    			attr_dev(td, "id", td_id_value = /*nice*/ ctx[7].title);
+    			add_location(td, file$1, 86, 28, 3262);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, td, anchor);
     			append_dev(td, t0);
     			append_dev(td, t1);
-    			append_dev(td, t2);
+    			if (if_block) if_block.m(td, null);
 
     			if (!mounted) {
     				dispose = listen_dev(td, "click", click_handler, false, false, false);
@@ -16469,15 +16827,28 @@ var app = (function () {
     		},
     		p: function update(new_ctx, dirty) {
     			ctx = new_ctx;
-    			if (dirty & /*board*/ 2 && t0_value !== (t0_value = /*nice*/ ctx[8].v1 + "")) set_data_dev(t0, t0_value);
-    			if (dirty & /*board*/ 2 && t2_value !== (t2_value = /*nice*/ ctx[8].pot + "")) set_data_dev(t2, t2_value);
+    			if (dirty & /*board*/ 2 && t0_value !== (t0_value = /*nice*/ ctx[7].v1 + "")) set_data_dev(t0, t0_value);
 
-    			if (dirty & /*board*/ 2 && td_id_value !== (td_id_value = /*nice*/ ctx[8].title)) {
+    			if (/*nice*/ ctx[7].pot) {
+    				if (if_block) {
+    					if_block.p(ctx, dirty);
+    				} else {
+    					if_block = create_if_block_1(ctx);
+    					if_block.c();
+    					if_block.m(td, null);
+    				}
+    			} else if (if_block) {
+    				if_block.d(1);
+    				if_block = null;
+    			}
+
+    			if (dirty & /*board*/ 2 && td_id_value !== (td_id_value = /*nice*/ ctx[7].title)) {
     				attr_dev(td, "id", td_id_value);
     			}
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(td);
+    			if (if_block) if_block.d();
     			mounted = false;
     			dispose();
     		}
@@ -16485,9 +16856,44 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
+    		id: create_if_block.name,
+    		type: "if",
+    		source: "(86:24) {#if nice.v1 == 0 && nice.title != 'Totalsum'}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (87:125) {#if nice.pot}
+    function create_if_block_1(ctx) {
+    	let t0;
+    	let t1_value = /*nice*/ ctx[7].pot + "";
+    	let t1;
+
+    	const block = {
+    		c: function create() {
+    			t0 = text("+ ");
+    			t1 = text(t1_value);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, t0, anchor);
+    			insert_dev(target, t1, anchor);
+    		},
+    		p: function update(ctx, dirty) {
+    			if (dirty & /*board*/ 2 && t1_value !== (t1_value = /*nice*/ ctx[7].pot + "")) set_data_dev(t1, t1_value);
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(t0);
+    			if (detaching) detach_dev(t1);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
     		id: create_if_block_1.name,
     		type: "if",
-    		source: "(87:28) {#if nice.pot}",
+    		source: "(87:125) {#if nice.pot}",
     		ctx
     	});
 
@@ -16498,18 +16904,18 @@ var app = (function () {
     function create_each_block(ctx) {
     	let tr;
     	let td0;
-    	let t0_value = /*nice*/ ctx[8].title + "";
+    	let t0_value = /*nice*/ ctx[7].title + "";
     	let t0;
     	let t1;
     	let t2;
     	let td1;
-    	let t3_value = /*nice*/ ctx[8].v2 + "";
+    	let t3_value = /*nice*/ ctx[7].v2 + "";
     	let t3;
     	let t4;
 
     	function select_block_type(ctx, dirty) {
-    		if (/*nice*/ ctx[8].v1 == 0) return create_if_block;
-    		return create_else_block_1;
+    		if (/*nice*/ ctx[7].v1 == 0 && /*nice*/ ctx[7].title != 'Totalsum') return create_if_block;
+    		return create_else_block;
     	}
 
     	let current_block_type = select_block_type(ctx);
@@ -16526,11 +16932,11 @@ var app = (function () {
     			td1 = element("td");
     			t3 = text(t3_value);
     			t4 = space();
-    			attr_dev(td0, "class", "svelte-6mxglo");
-    			add_location(td0, file$1, 84, 24, 3118);
-    			attr_dev(td1, "class", "svelte-6mxglo");
-    			add_location(td1, file$1, 94, 24, 3742);
-    			add_location(tr, file$1, 83, 20, 3088);
+    			attr_dev(td0, "class", "svelte-1gjl6jy");
+    			add_location(td0, file$1, 84, 24, 3139);
+    			attr_dev(td1, "class", "svelte-1gjl6jy");
+    			add_location(td1, file$1, 90, 24, 3555);
+    			add_location(tr, file$1, 83, 20, 3109);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, tr, anchor);
@@ -16544,7 +16950,7 @@ var app = (function () {
     			append_dev(tr, t4);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*board*/ 2 && t0_value !== (t0_value = /*nice*/ ctx[8].title + "")) set_data_dev(t0, t0_value);
+    			if (dirty & /*board*/ 2 && t0_value !== (t0_value = /*nice*/ ctx[7].title + "")) set_data_dev(t0, t0_value);
 
     			if (current_block_type === (current_block_type = select_block_type(ctx)) && if_block) {
     				if_block.p(ctx, dirty);
@@ -16558,7 +16964,7 @@ var app = (function () {
     				}
     			}
 
-    			if (dirty & /*board*/ 2 && t3_value !== (t3_value = /*nice*/ ctx[8].v2 + "")) set_data_dev(t3, t3_value);
+    			if (dirty & /*board*/ 2 && t3_value !== (t3_value = /*nice*/ ctx[7].v2 + "")) set_data_dev(t3, t3_value);
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(tr);
@@ -16666,25 +17072,25 @@ var app = (function () {
     			t9 = space();
     			button = element("button");
     			button.textContent = "FERDIG";
-    			attr_dev(div0, "class", "left svelte-6mxglo");
-    			add_location(div0, file$1, 69, 4, 2638);
-    			attr_dev(th0, "class", "svelte-6mxglo");
-    			add_location(th0, file$1, 78, 20, 2919);
-    			attr_dev(th1, "class", "svelte-6mxglo");
-    			add_location(th1, file$1, 79, 20, 2951);
-    			attr_dev(th2, "class", "svelte-6mxglo");
-    			add_location(th2, file$1, 80, 20, 2992);
-    			add_location(tr, file$1, 77, 16, 2893);
-    			add_location(table, file$1, 76, 12, 2868);
-    			attr_dev(div1, "class", "board svelte-6mxglo");
-    			add_location(div1, file$1, 75, 8, 2835);
+    			attr_dev(div0, "class", "left svelte-1gjl6jy");
+    			add_location(div0, file$1, 69, 4, 2659);
+    			attr_dev(th0, "class", "svelte-1gjl6jy");
+    			add_location(th0, file$1, 78, 20, 2940);
+    			attr_dev(th1, "class", "svelte-1gjl6jy");
+    			add_location(th1, file$1, 79, 20, 2972);
+    			attr_dev(th2, "class", "svelte-1gjl6jy");
+    			add_location(th2, file$1, 80, 20, 3013);
+    			add_location(tr, file$1, 77, 16, 2914);
+    			add_location(table, file$1, 76, 12, 2889);
+    			attr_dev(div1, "class", "board svelte-1gjl6jy");
+    			add_location(div1, file$1, 75, 8, 2856);
     			attr_dev(button, "id", "done-button");
-    			attr_dev(button, "class", "svelte-6mxglo");
-    			add_location(button, file$1, 99, 8, 3860);
-    			attr_dev(div2, "class", "right svelte-6mxglo");
-    			add_location(div2, file$1, 74, 4, 2806);
-    			attr_dev(div3, "class", "container svelte-6mxglo");
-    			add_location(div3, file$1, 68, 0, 2609);
+    			attr_dev(button, "class", "svelte-1gjl6jy");
+    			add_location(button, file$1, 95, 8, 3673);
+    			attr_dev(div2, "class", "right svelte-1gjl6jy");
+    			add_location(div2, file$1, 74, 4, 2827);
+    			attr_dev(div3, "class", "container svelte-1gjl6jy");
+    			add_location(div3, file$1, 68, 0, 2630);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -16720,7 +17126,7 @@ var app = (function () {
     			current = true;
 
     			if (!mounted) {
-    				dispose = listen_dev(button, "click", /*click_handler_2*/ ctx[7], false, false, false);
+    				dispose = listen_dev(button, "click", /*click_handler_1*/ ctx[6], false, false, false);
     				mounted = true;
     			}
     		},
@@ -16874,11 +17280,7 @@ var app = (function () {
     		clicked(nice.title, nice.pot);
     	};
 
-    	const click_handler_1 = nice => {
-    		clicked(nice.title, nice.pot);
-    	};
-
-    	const click_handler_2 = () => {
+    	const click_handler_1 = () => {
     		ferdig();
     	};
 
@@ -16888,6 +17290,7 @@ var app = (function () {
     		Board,
     		Overlay,
     		not,
+    		numericDependencies,
     		username,
     		clicked,
     		ferdig,
@@ -16985,17 +17388,7 @@ var app = (function () {
     	};
 
     	$$invalidate(0, engine = new Engine(5));
-
-    	return [
-    		engine,
-    		board,
-    		username,
-    		clicked,
-    		ferdig,
-    		click_handler,
-    		click_handler_1,
-    		click_handler_2
-    	];
+    	return [engine, board, username, clicked, ferdig, click_handler, click_handler_1];
     }
 
     class Home extends SvelteComponentDev {

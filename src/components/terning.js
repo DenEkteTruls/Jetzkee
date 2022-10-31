@@ -41,6 +41,10 @@ export class Engine {
     }
 
     new_round() {
+        if(this.points_detail.indexOf(0) == -1) {
+            this.done = true;
+        }
+
         if(this.done) {
             this.dizes = []
             this.chosen_list = [];

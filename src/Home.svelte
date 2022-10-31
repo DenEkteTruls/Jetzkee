@@ -4,7 +4,7 @@
     import PlayerBar from './components/PlayerBar.svelte';
     import Board from './components/Board.svelte';
     import Overlay from './components/Overlay.svelte';
-    import { not } from 'mathjs';
+    import { not, numericDependencies } from 'mathjs';
     
     $: engine = new Engine(5);
     var username = sessionStorage.getItem("username");
@@ -83,12 +83,8 @@
                 {#each board as nice}
                     <tr>
                         <td>{nice.title}</td>
-                        {#if nice.v1 == 0}
-                            {#if nice.pot}
-                                <td class="clickable" id={nice.title} on:click={() => {clicked(nice.title, nice.pot)}}>{nice.v1} + {nice.pot}</td>
-                            {:else}
-                                <td class="clickable" id={nice.title} on:click={() => {clicked(nice.title, nice.pot)}}>{nice.v1}</td>
-                            {/if}
+                        {#if nice.v1 == 0 && nice.title != 'Totalsum'}
+                            <td class="clickable" id={nice.title} on:click={() => {clicked(nice.title, nice.pot)}}>{nice.v1} {#if nice.pot}+ {nice.pot}{/if}</td>
                         {:else}
                             <td class="not-clickable">{nice.v1}</td>
                         {/if}
