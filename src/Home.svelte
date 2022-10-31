@@ -110,7 +110,7 @@
         display: grid;
         grid-template-columns: 50% 50%;
         background-color: var(--darkgreen);
-
+        min-width: 950px;
     }
 
     .right {
