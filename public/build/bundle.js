@@ -1674,6 +1674,1219 @@ var app = (function () {
     })));
     });
 
+    function sum$1(array) {
+        let a = 0;
+        for(let i = 0; i < array.length; i++) {
+            a += array[i];
+        }
+        return a;
+    }
+
+
+
+    class Engine {
+        constructor(antall) {
+            this.antall = antall;
+            this.num = this.antall;
+            this.chosen_list = [];
+            this.dizes = [];
+            this.tries_left = 3;
+            this.rounds = 0;
+
+            this.points = 0;
+            this.points_detail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+            this.bot_points = 0;
+
+            this.done = false;
+
+            this.roll_dize();
+        }
+
+        roll_dize() {
+            if(this.tries_left > 0) {
+                this.dizes = [...Array(this.num)].map(() => {return Math.floor(Math.random()*6)+1});
+                this.tries_left -= 1;
+            }
+        }
+
+        reset() {
+            this.tries_left = 3;
+            this.num = this.antall;
+            this.chosen_list = [];
+        }
+
+        new_round() {
+            if(this.done) {
+                this.dizes = [];
+                this.chosen_list = [];
+                if(this.points > localStorage.getItem("beste")) {
+                    localStorage.setItem("beste", this.points);
+                }
+            }
+
+            this.rounds++;
+
+            this.reset();
+            this.roll_dize();
+        }
+
+        new_chosen(chosen) {
+            if(this.chosen_list.length >= 5) return;
+            this.chosen_list = [...this.chosen_list, chosen];
+            delete this.dizes[this.dizes.indexOf(chosen)];
+            this.dizes = this.dizes.filter(function (a) {
+                return a != null;
+            });
+            this.num--;
+        }
+
+        remove_chosen(chosen) {
+            this.dizes = [...this.dizes, chosen];
+            delete this.chosen_list[this.chosen_list.indexOf(chosen)];
+            this.chosen_list = this.chosen_list.filter(function (a) {
+                return a != null;
+            });
+            this.num++;
+        }
+
+        calculate_points(id) {
+            if(typeof id == 'number') {
+                let points = 0;
+                for(let i = 0; i < this.dizes.length; i++) {
+                    if(this.dizes[i] == id) {
+                        points += id;
+                    }
+                }
+
+                for(let i = 0; i < this.chosen_list.length; i++) {
+                    if(this.chosen_list[i] == id) {
+                        points += id;
+                    }
+                }
+                return points;
+            }
+
+            if(typeof id == 'string') {
+                let a = this.dizes.concat(this.chosen_list);
+                switch (id) {
+                    case 'liten': {
+                        let checklist = [1, 2, 3, 4, 5];
+                        for(let i = 0; i < a.length; i++) {
+                            for(let x = 0; x < checklist.length; x++) {
+                                if(a[i] == checklist[x]) {
+                                    delete checklist[x];
+                                    checklist = checklist.filter(function (a) {
+                                        return a != null;
+                                    });
+                                }
+                            }
+                        }
+                        if(checklist.length != 0) return 0;
+                        else return 15;
+                    }
+
+                    case 'stor': {
+                        let checklist = [2, 3, 4, 5, 6];
+                        for(let i = 0; i < a.length; i++) {
+                            for(let x = 0; x < checklist.length; x++) {
+                                if(a[i] == checklist[x]) {
+                                    delete checklist[x];
+                                    checklist = checklist.filter(function (a) {
+                                        return a != null;
+                                    });
+                                }
+                            }
+                        }
+                        if(checklist.length != 0) return 0;
+                        else return 20;
+                    }
+
+                    case 'hus': {
+                        let counter = [0, 0, 0, 0, 0, 0];
+                        for(let x = 0; x < a.length; x++) {
+                            counter[a[x]-1]++;
+                        }
+                        if(counter.includes(2) && counter.includes(3)) {
+                            return (counter.indexOf(2)+1) * 2 + (counter.indexOf(3)+1) * 3
+                        } else {
+                            return 0;
+                        }
+                    }
+
+                    case 'sjanse': {
+                        return sum$1(a);
+                    }
+
+                    case 'yatzy': {
+                        return (sum$1(a) == 30) * 50;
+                    }
+                }
+            }
+        }
+    }
+
+    /* src\components\PlayerBar.svelte generated by Svelte v3.52.0 */
+
+    const file$4 = "src\\components\\PlayerBar.svelte";
+
+    // (16:8) {:else}
+    function create_else_block_1$1(ctx) {
+    	let img;
+    	let img_src_value;
+
+    	const block = {
+    		c: function create() {
+    			img = element("img");
+    			if (!src_url_equal(img.src, img_src_value = "media/profile1.png")) attr_dev(img, "src", img_src_value);
+    			attr_dev(img, "alt", "");
+    			attr_dev(img, "class", "svelte-1n1gggk");
+    			add_location(img, file$4, 16, 12, 315);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, img, anchor);
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(img);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_else_block_1$1.name,
+    		type: "else",
+    		source: "(16:8) {:else}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (14:8) {#if bot}
+    function create_if_block_2$1(ctx) {
+    	let img;
+    	let img_src_value;
+
+    	const block = {
+    		c: function create() {
+    			img = element("img");
+    			if (!src_url_equal(img.src, img_src_value = "media/profile2.png")) attr_dev(img, "src", img_src_value);
+    			attr_dev(img, "alt", "");
+    			attr_dev(img, "class", "svelte-1n1gggk");
+    			add_location(img, file$4, 14, 12, 246);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, img, anchor);
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(img);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block_2$1.name,
+    		type: "if",
+    		source: "(14:8) {#if bot}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (27:12) {:else}
+    function create_else_block$2(ctx) {
+    	let button;
+    	let mounted;
+    	let dispose;
+
+    	const block = {
+    		c: function create() {
+    			button = element("button");
+    			button.textContent = "KAST";
+    			attr_dev(button, "class", "not-cliackable svelte-1n1gggk");
+    			add_location(button, file$4, 27, 16, 697);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, button, anchor);
+
+    			if (!mounted) {
+    				dispose = listen_dev(button, "click", /*click_handler_1*/ ctx[5], false, false, false);
+    				mounted = true;
+    			}
+    		},
+    		p: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(button);
+    			mounted = false;
+    			dispose();
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_else_block$2.name,
+    		type: "else",
+    		source: "(27:12) {:else}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (25:12) {#if engine.tries_left > 0}
+    function create_if_block_1$1(ctx) {
+    	let button;
+    	let mounted;
+    	let dispose;
+
+    	const block = {
+    		c: function create() {
+    			button = element("button");
+    			button.textContent = "KAST";
+    			attr_dev(button, "id", "button");
+    			attr_dev(button, "class", "svelte-1n1gggk");
+    			add_location(button, file$4, 25, 16, 599);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, button, anchor);
+
+    			if (!mounted) {
+    				dispose = listen_dev(button, "click", /*click_handler*/ ctx[4], false, false, false);
+    				mounted = true;
+    			}
+    		},
+    		p: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(button);
+    			mounted = false;
+    			dispose();
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block_1$1.name,
+    		type: "if",
+    		source: "(25:12) {#if engine.tries_left > 0}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (24:8) {#if bot}
+    function create_if_block$2(ctx) {
+    	let button;
+
+    	const block = {
+    		c: function create() {
+    			button = element("button");
+    			attr_dev(button, "class", "svelte-1n1gggk");
+    			add_location(button, file$4, 23, 18, 523);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, button, anchor);
+    		},
+    		p: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(button);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block$2.name,
+    		type: "if",
+    		source: "(24:8) {#if bot}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function create_fragment$5(ctx) {
+    	let div3;
+    	let div0;
+    	let t0;
+    	let div1;
+    	let p;
+    	let t1;
+    	let t2;
+    	let div2;
+
+    	function select_block_type(ctx, dirty) {
+    		if (/*bot*/ ctx[1]) return create_if_block_2$1;
+    		return create_else_block_1$1;
+    	}
+
+    	let current_block_type = select_block_type(ctx);
+    	let if_block0 = current_block_type(ctx);
+
+    	function select_block_type_1(ctx, dirty) {
+    		if (/*bot*/ ctx[1]) return create_if_block$2;
+    		if (/*engine*/ ctx[2].tries_left > 0) return create_if_block_1$1;
+    		return create_else_block$2;
+    	}
+
+    	let current_block_type_1 = select_block_type_1(ctx);
+    	let if_block1 = current_block_type_1(ctx);
+
+    	const block = {
+    		c: function create() {
+    			div3 = element("div");
+    			div0 = element("div");
+    			if_block0.c();
+    			t0 = space();
+    			div1 = element("div");
+    			p = element("p");
+    			t1 = text(/*name*/ ctx[0]);
+    			t2 = space();
+    			div2 = element("div");
+    			if_block1.c();
+    			attr_dev(div0, "class", "profile-container svelte-1n1gggk");
+    			add_location(div0, file$4, 12, 4, 182);
+    			attr_dev(p, "id", "username");
+    			attr_dev(p, "class", "svelte-1n1gggk");
+    			add_location(p, file$4, 20, 8, 428);
+    			attr_dev(div1, "class", "username-container svelte-1n1gggk");
+    			add_location(div1, file$4, 19, 4, 386);
+    			attr_dev(div2, "class", "button-container svelte-1n1gggk");
+    			add_location(div2, file$4, 22, 4, 473);
+    			attr_dev(div3, "class", "container svelte-1n1gggk");
+    			add_location(div3, file$4, 11, 0, 153);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, div3, anchor);
+    			append_dev(div3, div0);
+    			if_block0.m(div0, null);
+    			append_dev(div3, t0);
+    			append_dev(div3, div1);
+    			append_dev(div1, p);
+    			append_dev(p, t1);
+    			append_dev(div3, t2);
+    			append_dev(div3, div2);
+    			if_block1.m(div2, null);
+    		},
+    		p: function update(ctx, [dirty]) {
+    			if (current_block_type !== (current_block_type = select_block_type(ctx))) {
+    				if_block0.d(1);
+    				if_block0 = current_block_type(ctx);
+
+    				if (if_block0) {
+    					if_block0.c();
+    					if_block0.m(div0, null);
+    				}
+    			}
+
+    			if (dirty & /*name*/ 1) set_data_dev(t1, /*name*/ ctx[0]);
+
+    			if (current_block_type_1 === (current_block_type_1 = select_block_type_1(ctx)) && if_block1) {
+    				if_block1.p(ctx, dirty);
+    			} else {
+    				if_block1.d(1);
+    				if_block1 = current_block_type_1(ctx);
+
+    				if (if_block1) {
+    					if_block1.c();
+    					if_block1.m(div2, null);
+    				}
+    			}
+    		},
+    		i: noop,
+    		o: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div3);
+    			if_block0.d();
+    			if_block1.d();
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$5.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$5($$self, $$props, $$invalidate) {
+    	let { $$slots: slots = {}, $$scope } = $$props;
+    	validate_slots('PlayerBar', slots, []);
+    	let { name } = $$props;
+    	let { bot } = $$props;
+    	let { engine } = $$props;
+
+    	function roll() {
+    		engine.roll_dize();
+    	}
+
+    	$$self.$$.on_mount.push(function () {
+    		if (name === undefined && !('name' in $$props || $$self.$$.bound[$$self.$$.props['name']])) {
+    			console.warn("<PlayerBar> was created without expected prop 'name'");
+    		}
+
+    		if (bot === undefined && !('bot' in $$props || $$self.$$.bound[$$self.$$.props['bot']])) {
+    			console.warn("<PlayerBar> was created without expected prop 'bot'");
+    		}
+
+    		if (engine === undefined && !('engine' in $$props || $$self.$$.bound[$$self.$$.props['engine']])) {
+    			console.warn("<PlayerBar> was created without expected prop 'engine'");
+    		}
+    	});
+
+    	const writable_props = ['name', 'bot', 'engine'];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<PlayerBar> was created with unknown prop '${key}'`);
+    	});
+
+    	const click_handler = () => {
+    		roll();
+    	};
+
+    	const click_handler_1 = () => {
+    		roll();
+    	};
+
+    	$$self.$$set = $$props => {
+    		if ('name' in $$props) $$invalidate(0, name = $$props.name);
+    		if ('bot' in $$props) $$invalidate(1, bot = $$props.bot);
+    		if ('engine' in $$props) $$invalidate(2, engine = $$props.engine);
+    	};
+
+    	$$self.$capture_state = () => ({ name, bot, engine, roll });
+
+    	$$self.$inject_state = $$props => {
+    		if ('name' in $$props) $$invalidate(0, name = $$props.name);
+    		if ('bot' in $$props) $$invalidate(1, bot = $$props.bot);
+    		if ('engine' in $$props) $$invalidate(2, engine = $$props.engine);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [name, bot, engine, roll, click_handler, click_handler_1];
+    }
+
+    class PlayerBar extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+    		init(this, options, instance$5, create_fragment$5, safe_not_equal, { name: 0, bot: 1, engine: 2 });
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "PlayerBar",
+    			options,
+    			id: create_fragment$5.name
+    		});
+    	}
+
+    	get name() {
+    		throw new Error("<PlayerBar>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set name(value) {
+    		throw new Error("<PlayerBar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get bot() {
+    		throw new Error("<PlayerBar>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set bot(value) {
+    		throw new Error("<PlayerBar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	get engine() {
+    		throw new Error("<PlayerBar>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set engine(value) {
+    		throw new Error("<PlayerBar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    /* src\components\Board.svelte generated by Svelte v3.52.0 */
+
+    const file$3 = "src\\components\\Board.svelte";
+
+    function get_each_context$1(ctx, list, i) {
+    	const child_ctx = ctx.slice();
+    	child_ctx[3] = list[i];
+    	return child_ctx;
+    }
+
+    function get_each_context_1(ctx, list, i) {
+    	const child_ctx = ctx.slice();
+    	child_ctx[6] = list[i];
+    	return child_ctx;
+    }
+
+    function get_each_context_2(ctx, list, i) {
+    	const child_ctx = ctx.slice();
+    	child_ctx[3] = list[i];
+    	return child_ctx;
+    }
+
+    // (10:8) {#each engine.dizes as dice}
+    function create_each_block_2(ctx) {
+    	let img;
+    	let img_id_value;
+    	let img_src_value;
+
+    	const block = {
+    		c: function create() {
+    			img = element("img");
+    			attr_dev(img, "class", "dice svelte-1c6htka");
+    			attr_dev(img, "id", img_id_value = /*dice*/ ctx[3]);
+    			if (!src_url_equal(img.src, img_src_value = "media/" + /*dice*/ ctx[3] + ".png")) attr_dev(img, "src", img_src_value);
+    			attr_dev(img, "alt", "");
+    			add_location(img, file$3, 10, 12, 162);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, img, anchor);
+    		},
+    		p: function update(ctx, dirty) {
+    			if (dirty & /*engine*/ 1 && img_id_value !== (img_id_value = /*dice*/ ctx[3])) {
+    				attr_dev(img, "id", img_id_value);
+    			}
+
+    			if (dirty & /*engine*/ 1 && !src_url_equal(img.src, img_src_value = "media/" + /*dice*/ ctx[3] + ".png")) {
+    				attr_dev(img, "src", img_src_value);
+    			}
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(img);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_each_block_2.name,
+    		type: "each",
+    		source: "(10:8) {#each engine.dizes as dice}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (15:8) {#each engine.chosen_list as chosen}
+    function create_each_block_1(ctx) {
+    	let img;
+    	let img_id_value;
+    	let img_src_value;
+    	let mounted;
+    	let dispose;
+
+    	function click_handler() {
+    		return /*click_handler*/ ctx[1](/*chosen*/ ctx[6]);
+    	}
+
+    	const block = {
+    		c: function create() {
+    			img = element("img");
+    			attr_dev(img, "class", "dice svelte-1c6htka");
+    			attr_dev(img, "id", img_id_value = /*chosen*/ ctx[6]);
+    			if (!src_url_equal(img.src, img_src_value = "media/" + /*chosen*/ ctx[6] + ".png")) attr_dev(img, "src", img_src_value);
+    			attr_dev(img, "alt", "");
+    			add_location(img, file$3, 15, 12, 344);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, img, anchor);
+
+    			if (!mounted) {
+    				dispose = listen_dev(img, "click", click_handler, false, false, false);
+    				mounted = true;
+    			}
+    		},
+    		p: function update(new_ctx, dirty) {
+    			ctx = new_ctx;
+
+    			if (dirty & /*engine*/ 1 && img_id_value !== (img_id_value = /*chosen*/ ctx[6])) {
+    				attr_dev(img, "id", img_id_value);
+    			}
+
+    			if (dirty & /*engine*/ 1 && !src_url_equal(img.src, img_src_value = "media/" + /*chosen*/ ctx[6] + ".png")) {
+    				attr_dev(img, "src", img_src_value);
+    			}
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(img);
+    			mounted = false;
+    			dispose();
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_each_block_1.name,
+    		type: "each",
+    		source: "(15:8) {#each engine.chosen_list as chosen}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (20:8) {#each engine.dizes as dice}
+    function create_each_block$1(ctx) {
+    	let img;
+    	let img_id_value;
+    	let img_src_value;
+    	let mounted;
+    	let dispose;
+
+    	function click_handler_1() {
+    		return /*click_handler_1*/ ctx[2](/*dice*/ ctx[3]);
+    	}
+
+    	const block = {
+    		c: function create() {
+    			img = element("img");
+    			attr_dev(img, "class", "dice svelte-1c6htka");
+    			attr_dev(img, "id", img_id_value = /*dice*/ ctx[3]);
+    			if (!src_url_equal(img.src, img_src_value = "media/" + /*dice*/ ctx[3] + ".png")) attr_dev(img, "src", img_src_value);
+    			attr_dev(img, "alt", "");
+    			add_location(img, file$3, 20, 12, 584);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, img, anchor);
+
+    			if (!mounted) {
+    				dispose = listen_dev(img, "click", click_handler_1, false, false, false);
+    				mounted = true;
+    			}
+    		},
+    		p: function update(new_ctx, dirty) {
+    			ctx = new_ctx;
+
+    			if (dirty & /*engine*/ 1 && img_id_value !== (img_id_value = /*dice*/ ctx[3])) {
+    				attr_dev(img, "id", img_id_value);
+    			}
+
+    			if (dirty & /*engine*/ 1 && !src_url_equal(img.src, img_src_value = "media/" + /*dice*/ ctx[3] + ".png")) {
+    				attr_dev(img, "src", img_src_value);
+    			}
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(img);
+    			mounted = false;
+    			dispose();
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_each_block$1.name,
+    		type: "each",
+    		source: "(20:8) {#each engine.dizes as dice}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function create_fragment$4(ctx) {
+    	let div3;
+    	let div0;
+    	let t0;
+    	let div1;
+    	let t1;
+    	let div2;
+    	let each_value_2 = /*engine*/ ctx[0].dizes;
+    	validate_each_argument(each_value_2);
+    	let each_blocks_2 = [];
+
+    	for (let i = 0; i < each_value_2.length; i += 1) {
+    		each_blocks_2[i] = create_each_block_2(get_each_context_2(ctx, each_value_2, i));
+    	}
+
+    	let each_value_1 = /*engine*/ ctx[0].chosen_list;
+    	validate_each_argument(each_value_1);
+    	let each_blocks_1 = [];
+
+    	for (let i = 0; i < each_value_1.length; i += 1) {
+    		each_blocks_1[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
+    	}
+
+    	let each_value = /*engine*/ ctx[0].dizes;
+    	validate_each_argument(each_value);
+    	let each_blocks = [];
+
+    	for (let i = 0; i < each_value.length; i += 1) {
+    		each_blocks[i] = create_each_block$1(get_each_context$1(ctx, each_value, i));
+    	}
+
+    	const block = {
+    		c: function create() {
+    			div3 = element("div");
+    			div0 = element("div");
+
+    			for (let i = 0; i < each_blocks_2.length; i += 1) {
+    				each_blocks_2[i].c();
+    			}
+
+    			t0 = space();
+    			div1 = element("div");
+
+    			for (let i = 0; i < each_blocks_1.length; i += 1) {
+    				each_blocks_1[i].c();
+    			}
+
+    			t1 = space();
+    			div2 = element("div");
+
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				each_blocks[i].c();
+    			}
+
+    			attr_dev(div0, "class", "dizeholder hidden svelte-1c6htka");
+    			add_location(div0, file$3, 8, 4, 79);
+    			attr_dev(div1, "class", "dizeholder svelte-1c6htka");
+    			add_location(div1, file$3, 13, 4, 260);
+    			attr_dev(div2, "class", "dizeholder svelte-1c6htka");
+    			add_location(div2, file$3, 18, 4, 508);
+    			attr_dev(div3, "id", "container");
+    			attr_dev(div3, "class", "svelte-1c6htka");
+    			add_location(div3, file$3, 7, 0, 53);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, div3, anchor);
+    			append_dev(div3, div0);
+
+    			for (let i = 0; i < each_blocks_2.length; i += 1) {
+    				each_blocks_2[i].m(div0, null);
+    			}
+
+    			append_dev(div3, t0);
+    			append_dev(div3, div1);
+
+    			for (let i = 0; i < each_blocks_1.length; i += 1) {
+    				each_blocks_1[i].m(div1, null);
+    			}
+
+    			append_dev(div3, t1);
+    			append_dev(div3, div2);
+
+    			for (let i = 0; i < each_blocks.length; i += 1) {
+    				each_blocks[i].m(div2, null);
+    			}
+    		},
+    		p: function update(ctx, [dirty]) {
+    			if (dirty & /*engine*/ 1) {
+    				each_value_2 = /*engine*/ ctx[0].dizes;
+    				validate_each_argument(each_value_2);
+    				let i;
+
+    				for (i = 0; i < each_value_2.length; i += 1) {
+    					const child_ctx = get_each_context_2(ctx, each_value_2, i);
+
+    					if (each_blocks_2[i]) {
+    						each_blocks_2[i].p(child_ctx, dirty);
+    					} else {
+    						each_blocks_2[i] = create_each_block_2(child_ctx);
+    						each_blocks_2[i].c();
+    						each_blocks_2[i].m(div0, null);
+    					}
+    				}
+
+    				for (; i < each_blocks_2.length; i += 1) {
+    					each_blocks_2[i].d(1);
+    				}
+
+    				each_blocks_2.length = each_value_2.length;
+    			}
+
+    			if (dirty & /*engine*/ 1) {
+    				each_value_1 = /*engine*/ ctx[0].chosen_list;
+    				validate_each_argument(each_value_1);
+    				let i;
+
+    				for (i = 0; i < each_value_1.length; i += 1) {
+    					const child_ctx = get_each_context_1(ctx, each_value_1, i);
+
+    					if (each_blocks_1[i]) {
+    						each_blocks_1[i].p(child_ctx, dirty);
+    					} else {
+    						each_blocks_1[i] = create_each_block_1(child_ctx);
+    						each_blocks_1[i].c();
+    						each_blocks_1[i].m(div1, null);
+    					}
+    				}
+
+    				for (; i < each_blocks_1.length; i += 1) {
+    					each_blocks_1[i].d(1);
+    				}
+
+    				each_blocks_1.length = each_value_1.length;
+    			}
+
+    			if (dirty & /*engine*/ 1) {
+    				each_value = /*engine*/ ctx[0].dizes;
+    				validate_each_argument(each_value);
+    				let i;
+
+    				for (i = 0; i < each_value.length; i += 1) {
+    					const child_ctx = get_each_context$1(ctx, each_value, i);
+
+    					if (each_blocks[i]) {
+    						each_blocks[i].p(child_ctx, dirty);
+    					} else {
+    						each_blocks[i] = create_each_block$1(child_ctx);
+    						each_blocks[i].c();
+    						each_blocks[i].m(div2, null);
+    					}
+    				}
+
+    				for (; i < each_blocks.length; i += 1) {
+    					each_blocks[i].d(1);
+    				}
+
+    				each_blocks.length = each_value.length;
+    			}
+    		},
+    		i: noop,
+    		o: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div3);
+    			destroy_each(each_blocks_2, detaching);
+    			destroy_each(each_blocks_1, detaching);
+    			destroy_each(each_blocks, detaching);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$4.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$4($$self, $$props, $$invalidate) {
+    	let { $$slots: slots = {}, $$scope } = $$props;
+    	validate_slots('Board', slots, []);
+    	let { engine } = $$props;
+
+    	$$self.$$.on_mount.push(function () {
+    		if (engine === undefined && !('engine' in $$props || $$self.$$.bound[$$self.$$.props['engine']])) {
+    			console.warn("<Board> was created without expected prop 'engine'");
+    		}
+    	});
+
+    	const writable_props = ['engine'];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Board> was created with unknown prop '${key}'`);
+    	});
+
+    	const click_handler = chosen => {
+    		engine.remove_chosen(chosen);
+    		$$invalidate(0, engine);
+    	};
+
+    	const click_handler_1 = dice => {
+    		engine.new_chosen(dice);
+    		$$invalidate(0, engine);
+    	};
+
+    	$$self.$$set = $$props => {
+    		if ('engine' in $$props) $$invalidate(0, engine = $$props.engine);
+    	};
+
+    	$$self.$capture_state = () => ({ engine });
+
+    	$$self.$inject_state = $$props => {
+    		if ('engine' in $$props) $$invalidate(0, engine = $$props.engine);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [engine, click_handler, click_handler_1];
+    }
+
+    class Board extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+    		init(this, options, instance$4, create_fragment$4, safe_not_equal, { engine: 0 });
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "Board",
+    			options,
+    			id: create_fragment$4.name
+    		});
+    	}
+
+    	get engine() {
+    		throw new Error("<Board>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set engine(value) {
+    		throw new Error("<Board>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
+    /* src\components\Overlay.svelte generated by Svelte v3.52.0 */
+
+    const file$2 = "src\\components\\Overlay.svelte";
+
+    // (16:8) {:else}
+    function create_else_block$1(ctx) {
+    	let h1;
+
+    	const block = {
+    		c: function create() {
+    			h1 = element("h1");
+    			h1.textContent = "Prøv igjen!";
+    			attr_dev(h1, "id", "title");
+    			attr_dev(h1, "class", "svelte-18awu33");
+    			add_location(h1, file$2, 16, 12, 354);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, h1, anchor);
+    		},
+    		p: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(h1);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_else_block$1.name,
+    		type: "else",
+    		source: "(16:8) {:else}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (14:8) {#if vinner()}
+    function create_if_block$1(ctx) {
+    	let h1;
+
+    	const block = {
+    		c: function create() {
+    			h1 = element("h1");
+    			h1.textContent = `Du vant ${sessionStorage.getItem("username")}!`;
+    			attr_dev(h1, "id", "title");
+    			attr_dev(h1, "class", "svelte-18awu33");
+    			add_location(h1, file$2, 14, 12, 258);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, h1, anchor);
+    		},
+    		p: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(h1);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block$1.name,
+    		type: "if",
+    		source: "(14:8) {#if vinner()}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function create_fragment$3(ctx) {
+    	let div2;
+    	let div1;
+    	let t0;
+    	let img;
+    	let img_src_value;
+    	let t1;
+    	let div0;
+    	let p0;
+    	let t2;
+    	let t3_value = /*engine*/ ctx[0].points + "";
+    	let t3;
+    	let t4;
+    	let p1;
+    	let t7;
+    	let button;
+    	let mounted;
+    	let dispose;
+
+    	function select_block_type(ctx, dirty) {
+    		if (/*vinner*/ ctx[1]()) return create_if_block$1;
+    		return create_else_block$1;
+    	}
+
+    	let current_block_type = select_block_type(ctx);
+    	let if_block = current_block_type(ctx);
+
+    	const block = {
+    		c: function create() {
+    			div2 = element("div");
+    			div1 = element("div");
+    			if_block.c();
+    			t0 = space();
+    			img = element("img");
+    			t1 = space();
+    			div0 = element("div");
+    			p0 = element("p");
+    			t2 = text("Poeng: ");
+    			t3 = text(t3_value);
+    			t4 = space();
+    			p1 = element("p");
+    			p1.textContent = `Beste: ${localStorage.getItem("beste")}`;
+    			t7 = space();
+    			button = element("button");
+    			button.textContent = "RESTART";
+    			if (!src_url_equal(img.src, img_src_value = "media/image2.png")) attr_dev(img, "src", img_src_value);
+    			attr_dev(img, "alt", "");
+    			attr_dev(img, "id", "logo");
+    			attr_dev(img, "class", "svelte-18awu33");
+    			add_location(img, file$2, 18, 8, 410);
+    			attr_dev(p0, "id", "points");
+    			add_location(p0, file$2, 20, 12, 500);
+    			add_location(p1, file$2, 21, 12, 555);
+    			attr_dev(div0, "class", "bottom svelte-18awu33");
+    			add_location(div0, file$2, 19, 8, 466);
+    			attr_dev(button, "id", "restart");
+    			attr_dev(button, "class", "svelte-18awu33");
+    			add_location(button, file$2, 23, 8, 626);
+    			attr_dev(div1, "class", "card svelte-18awu33");
+    			add_location(div1, file$2, 12, 4, 202);
+    			attr_dev(div2, "class", "container svelte-18awu33");
+    			add_location(div2, file$2, 11, 0, 173);
+    		},
+    		l: function claim(nodes) {
+    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, div2, anchor);
+    			append_dev(div2, div1);
+    			if_block.m(div1, null);
+    			append_dev(div1, t0);
+    			append_dev(div1, img);
+    			append_dev(div1, t1);
+    			append_dev(div1, div0);
+    			append_dev(div0, p0);
+    			append_dev(p0, t2);
+    			append_dev(p0, t3);
+    			append_dev(div0, t4);
+    			append_dev(div0, p1);
+    			append_dev(div1, t7);
+    			append_dev(div1, button);
+
+    			if (!mounted) {
+    				dispose = listen_dev(button, "click", /*click_handler*/ ctx[2], false, false, false);
+    				mounted = true;
+    			}
+    		},
+    		p: function update(ctx, [dirty]) {
+    			if_block.p(ctx, dirty);
+    			if (dirty & /*engine*/ 1 && t3_value !== (t3_value = /*engine*/ ctx[0].points + "")) set_data_dev(t3, t3_value);
+    		},
+    		i: noop,
+    		o: noop,
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(div2);
+    			if_block.d();
+    			mounted = false;
+    			dispose();
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_fragment$3.name,
+    		type: "component",
+    		source: "",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    function instance$3($$self, $$props, $$invalidate) {
+    	let { $$slots: slots = {}, $$scope } = $$props;
+    	validate_slots('Overlay', slots, []);
+    	let { engine } = $$props;
+
+    	function vinner() {
+    		if (engine.points > engine.bot_points) return true; else return false;
+    	}
+
+    	$$self.$$.on_mount.push(function () {
+    		if (engine === undefined && !('engine' in $$props || $$self.$$.bound[$$self.$$.props['engine']])) {
+    			console.warn("<Overlay> was created without expected prop 'engine'");
+    		}
+    	});
+
+    	const writable_props = ['engine'];
+
+    	Object.keys($$props).forEach(key => {
+    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Overlay> was created with unknown prop '${key}'`);
+    	});
+
+    	const click_handler = () => {
+    		window.location.href = "/game";
+    	};
+
+    	$$self.$$set = $$props => {
+    		if ('engine' in $$props) $$invalidate(0, engine = $$props.engine);
+    	};
+
+    	$$self.$capture_state = () => ({ engine, vinner });
+
+    	$$self.$inject_state = $$props => {
+    		if ('engine' in $$props) $$invalidate(0, engine = $$props.engine);
+    	};
+
+    	if ($$props && "$$inject" in $$props) {
+    		$$self.$inject_state($$props.$$inject);
+    	}
+
+    	return [engine, vinner, click_handler];
+    }
+
+    class Overlay extends SvelteComponentDev {
+    	constructor(options) {
+    		super(options);
+    		init(this, options, instance$3, create_fragment$3, safe_not_equal, { engine: 0 });
+
+    		dispatch_dev("SvelteRegisterComponent", {
+    			component: this,
+    			tagName: "Overlay",
+    			options,
+    			id: create_fragment$3.name
+    		});
+    	}
+
+    	get engine() {
+    		throw new Error("<Overlay>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set engine(value) {
+    		throw new Error("<Overlay>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+    }
+
     function _extends() {
       _extends = Object.assign ? Object.assign.bind() : function (target) {
         for (var i = 1; i < arguments.length; i++) {
@@ -1917,21 +3130,6 @@ var app = (function () {
         }
       }
       return clone;
-    }
-
-    /**
-     * Extend object a with the properties of object b
-     * @param {Object} a
-     * @param {Object} b
-     * @return {Object} a
-     */
-    function extend(a, b) {
-      for (var prop in b) {
-        if (hasOwnProperty$1(b, prop)) {
-          a[prop] = b[prop];
-        }
-      }
-      return a;
     }
 
     /**
@@ -4797,50 +5995,6 @@ var app = (function () {
     }
 
     /**
-     * Minimum number added to one that makes the result different than one
-     */
-    var DBL_EPSILON = Number.EPSILON || 2.2204460492503130808472633361816E-16;
-
-    /**
-     * Compares two floating point numbers.
-     * @param {number} x          First value to compare
-     * @param {number} y          Second value to compare
-     * @param {number} [epsilon]  The maximum relative difference between x and y
-     *                            If epsilon is undefined or null, the function will
-     *                            test whether x and y are exactly equal.
-     * @return {boolean} whether the two numbers are nearly equal
-    */
-    function nearlyEqual$1(x, y, epsilon) {
-      // if epsilon is null or undefined, test whether x and y are exactly equal
-      if (epsilon === null || epsilon === undefined) {
-        return x === y;
-      }
-      if (x === y) {
-        return true;
-      }
-
-      // NaN
-      if (isNaN(x) || isNaN(y)) {
-        return false;
-      }
-
-      // at this point x and y should be finite
-      if (isFinite(x) && isFinite(y)) {
-        // check numbers are very close, needed when comparing numbers near zero
-        var diff = Math.abs(x - y);
-        if (diff < DBL_EPSILON) {
-          return true;
-        } else {
-          // use relative error
-          return diff <= Math.max(Math.abs(x), Math.abs(y)) * epsilon;
-        }
-      }
-
-      // Infinite and Number or negative Infinite and positive Infinite cases
-      return false;
-    }
-
-    /**
      * Formats a BigNumber in a given base
      * @param {BigNumber} n
      * @param {number} base
@@ -5950,14 +7104,14 @@ var app = (function () {
       _createTyped2 = typedFunction.create;
       return typedFunction;
     };
-    var dependencies$m = ['?BigNumber', '?Complex', '?DenseMatrix', '?Fraction'];
+    var dependencies$6 = ['?BigNumber', '?Complex', '?DenseMatrix', '?Fraction'];
 
     /**
      * Factory function for creating a new typed instance
      * @param {Object} dependencies   Object with data types like Complex and BigNumber
      * @returns {Function}
      */
-    var createTyped = /* #__PURE__ */factory('typed', dependencies$m, function createTyped(_ref) {
+    var createTyped = /* #__PURE__ */factory('typed', dependencies$6, function createTyped(_ref) {
       var {
         BigNumber,
         Complex,
@@ -10329,7 +11483,7 @@ var app = (function () {
      * y {number|string|Decimal}
      *
      */
-    function add$1(x, y) {
+    function add(x, y) {
       return new this(x).plus(y);
     }
 
@@ -10712,7 +11866,7 @@ var app = (function () {
       Decimal.abs = abs;
       Decimal.acos = acos;
       Decimal.acosh = acosh;        // ES6
-      Decimal.add = add$1;
+      Decimal.add = add;
       Decimal.asin = asin;
       Decimal.asinh = asinh;        // ES6
       Decimal.atan = atan;
@@ -10743,7 +11897,7 @@ var app = (function () {
       Decimal.sinh = sinh;          // ES6
       Decimal.sqrt = sqrt;
       Decimal.sub = sub;
-      Decimal.sum = sum$1;
+      Decimal.sum = sum;
       Decimal.tan = tan;
       Decimal.tanh = tanh;          // ES6
       Decimal.trunc = trunc;        // ES6
@@ -11147,7 +12301,7 @@ var app = (function () {
      * arguments {number|string|Decimal}
      *
      */
-    function sum$1() {
+    function sum() {
       var i = 0,
         args = arguments,
         x = new this(args[i]);
@@ -11205,9 +12359,9 @@ var app = (function () {
     LN10 = new Decimal(LN10);
     PI = new Decimal(PI);
 
-    var name$l = 'BigNumber';
-    var dependencies$l = ['?on', 'config'];
-    var createBigNumberClass = /* #__PURE__ */factory(name$l, dependencies$l, _ref => {
+    var name$5 = 'BigNumber';
+    var dependencies$5 = ['?on', 'config'];
+    var createBigNumberClass = /* #__PURE__ */factory(name$5, dependencies$5, _ref => {
       var {
         on,
         config
@@ -12671,9 +13825,9 @@ var app = (function () {
 
     var Complex$1 = /*@__PURE__*/getDefaultExportFromCjs(complex);
 
-    var name$k = 'Complex';
-    var dependencies$k = [];
-    var createComplexClass = /* #__PURE__ */factory(name$k, dependencies$k, () => {
+    var name$4 = 'Complex';
+    var dependencies$4 = [];
+    var createComplexClass = /* #__PURE__ */factory(name$4, dependencies$4, () => {
       /**
        * Attach type information
        */
@@ -12870,7 +14024,7 @@ var app = (function () {
      * Dual licensed under the MIT or GPL Version 2 licenses.
      **/
 
-    var fraction$1 = createCommonjsModule(function (module, exports) {
+    var fraction = createCommonjsModule(function (module, exports) {
     /**
      *
      * This class offers the possibility to calculate fractions.
@@ -13744,11 +14898,11 @@ var app = (function () {
     })();
     });
 
-    var Fraction$1 = /*@__PURE__*/getDefaultExportFromCjs(fraction$1);
+    var Fraction$1 = /*@__PURE__*/getDefaultExportFromCjs(fraction);
 
-    var name$j = 'Fraction';
-    var dependencies$j = [];
-    var createFractionClass = /* #__PURE__ */factory(name$j, dependencies$j, () => {
+    var name$3 = 'Fraction';
+    var dependencies$3 = [];
+    var createFractionClass = /* #__PURE__ */factory(name$3, dependencies$3, () => {
       /**
        * Attach type information
        */
@@ -13786,9 +14940,9 @@ var app = (function () {
       isClass: true
     });
 
-    var name$i = 'Matrix';
-    var dependencies$i = [];
-    var createMatrixClass = /* #__PURE__ */factory(name$i, dependencies$i, () => {
+    var name$2 = 'Matrix';
+    var dependencies$2 = [];
+    var createMatrixClass = /* #__PURE__ */factory(name$2, dependencies$2, () => {
       /**
        * @constructor Matrix
        *
@@ -14043,9 +15197,9 @@ var app = (function () {
       }, -1);
     }
 
-    var name$h = 'DenseMatrix';
-    var dependencies$h = ['Matrix'];
-    var createDenseMatrixClass = /* #__PURE__ */factory(name$h, dependencies$h, _ref => {
+    var name$1 = 'DenseMatrix';
+    var dependencies$1 = ['Matrix'];
+    var createDenseMatrixClass = /* #__PURE__ */factory(name$1, dependencies$1, _ref => {
       var {
         Matrix
       } = _ref;
@@ -14980,63 +16134,6 @@ var app = (function () {
     });
 
     /**
-     * Transpose a matrix
-     * @param {Array} mat
-     * @returns {Array} ret
-     * @private
-     */
-    function _switch(mat) {
-      var I = mat.length;
-      var J = mat[0].length;
-      var i, j;
-      var ret = [];
-      for (j = 0; j < J; j++) {
-        var tmp = [];
-        for (i = 0; i < I; i++) {
-          tmp.push(mat[i][j]);
-        }
-        ret.push(tmp);
-      }
-      return ret;
-    }
-
-    /**
-     * Test whether an array contains collections
-     * @param {Array} array
-     * @returns {boolean} Returns true when the array contains one or multiple
-     *                    collections (Arrays or Matrices). Returns false otherwise.
-     */
-    function containsCollections(array) {
-      for (var i = 0; i < array.length; i++) {
-        if (isCollection(array[i])) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /**
-     * Recursively loop over all elements in a given multi dimensional array
-     * and invoke the callback on each of the elements.
-     * @param {Array | Matrix} array
-     * @param {Function} callback     The callback method is invoked with one
-     *                                parameter: the current element in the array
-     */
-    function deepForEach(array, callback) {
-      if (isMatrix(array)) {
-        array = array.valueOf();
-      }
-      for (var i = 0, ii = array.length; i < ii; i++) {
-        var value = array[i];
-        if (Array.isArray(value)) {
-          deepForEach(value, callback);
-        } else {
-          callback(value);
-        }
-      }
-    }
-
-    /**
      * Execute the callback function element wise for each element in array and any
      * nested array
      * Returns an array with the results
@@ -15059,3331 +16156,55 @@ var app = (function () {
       }
     }
 
-    /**
-     * Reduce a given matrix or array to a new matrix or
-     * array with one less dimension, applying the given
-     * callback in the selected dimension.
-     * @param {Array | Matrix} mat
-     * @param {number} dim
-     * @param {Function} callback
-     * @return {Array | Matrix} res
-     */
-    function reduce(mat, dim, callback) {
-      var size = Array.isArray(mat) ? arraySize(mat) : mat.size();
-      if (dim < 0 || dim >= size.length) {
-        // TODO: would be more clear when throwing a DimensionError here
-        throw new IndexError(dim, size.length);
-      }
-      if (isMatrix(mat)) {
-        return mat.create(_reduce(mat.valueOf(), dim, callback));
-      } else {
-        return _reduce(mat, dim, callback);
-      }
+    var n1 = 'number';
+    function notNumber(x) {
+      return !x;
     }
-
-    /**
-     * Recursively reduce a matrix
-     * @param {Array} mat
-     * @param {number} dim
-     * @param {Function} callback
-     * @returns {Array} ret
-     * @private
-     */
-    function _reduce(mat, dim, callback) {
-      var i, ret, val, tran;
-      if (dim <= 0) {
-        if (!Array.isArray(mat[0])) {
-          val = mat[0];
-          for (i = 1; i < mat.length; i++) {
-            val = callback(val, mat[i]);
-          }
-          return val;
-        } else {
-          tran = _switch(mat);
-          ret = [];
-          for (i = 0; i < tran.length; i++) {
-            ret[i] = _reduce(tran[i], dim - 1, callback);
-          }
-          return ret;
-        }
-      } else {
-        ret = [];
-        for (i = 0; i < mat.length; i++) {
-          ret[i] = _reduce(mat[i], dim - 1, callback);
-        }
-        return ret;
-      }
-    }
-
-    var n2$1 = 'number, number';
-    function addNumber(a, b) {
-      return a + b;
-    }
-    addNumber.signature = n2$1;
-
-    var n2 = 'number, number';
-    function bitOrNumber(x, y) {
-      if (!isInteger(x) || !isInteger(y)) {
-        throw new Error('Integers expected in function bitOr');
-      }
-      return x | y;
-    }
-    bitOrNumber.signature = n2;
-
-    /**
-     * Compares two BigNumbers.
-     * @param {BigNumber} x       First value to compare
-     * @param {BigNumber} y       Second value to compare
-     * @param {number} [epsilon]  The maximum relative difference between x and y
-     *                            If epsilon is undefined or null, the function will
-     *                            test whether x and y are exactly equal.
-     * @return {boolean} whether the two numbers are nearly equal
-     */
-    function nearlyEqual(x, y, epsilon) {
-      // if epsilon is null or undefined, test whether x and y are exactly equal
-      if (epsilon === null || epsilon === undefined) {
-        return x.eq(y);
-      }
-
-      // use "==" operator, handles infinities
-      if (x.eq(y)) {
-        return true;
-      }
-
-      // NaN
-      if (x.isNaN() || y.isNaN()) {
-        return false;
-      }
-
-      // at this point x and y should be finite
-      if (x.isFinite() && y.isFinite()) {
-        // check numbers are very close, needed when comparing numbers near zero
-        var diff = x.minus(y).abs();
-        if (diff.isZero()) {
-          return true;
-        } else {
-          // use relative error
-          var max = x.constructor.max(x.abs(), y.abs());
-          return diff.lte(max.times(epsilon));
-        }
-      }
-
-      // Infinite and Number or negative Infinite and positive Infinite cases
-      return false;
-    }
-
-    /**
-     * Test whether two complex values are equal provided a given epsilon.
-     * Does not use or change the global Complex.EPSILON setting
-     * @param {Complex} x
-     * @param {Complex} y
-     * @param {number} epsilon
-     * @returns {boolean}
-     */
-    function complexEquals(x, y, epsilon) {
-      return nearlyEqual$1(x.re, y.re, epsilon) && nearlyEqual$1(x.im, y.im, epsilon);
-    }
-
-    var createCompareUnits = /* #__PURE__ */factory('compareUnits', ['typed'], _ref => {
-      var {
-        typed
-      } = _ref;
-      return {
-        'Unit, Unit': typed.referToSelf(self => (x, y) => {
-          if (!x.equalBase(y)) {
-            throw new Error('Cannot compare units with different base');
-          }
-          return typed.find(self, [x.valueType(), y.valueType()])(x.value, y.value);
-        })
-      };
-    });
-
-    var name$g = 'equalScalar';
-    var dependencies$g = ['typed', 'config'];
-    var createEqualScalar = /* #__PURE__ */factory(name$g, dependencies$g, _ref => {
-      var {
-        typed,
-        config
-      } = _ref;
-      var compareUnits = createCompareUnits({
-        typed
-      });
-
-      /**
-       * Test whether two scalar values are nearly equal.
-       *
-       * @param  {number | BigNumber | Fraction | boolean | Complex | Unit} x   First value to compare
-       * @param  {number | BigNumber | Fraction | boolean | Complex} y          Second value to compare
-       * @return {boolean}                                                  Returns true when the compared values are equal, else returns false
-       * @private
-       */
-      return typed(name$g, {
-        'boolean, boolean': function booleanBoolean(x, y) {
-          return x === y;
-        },
-        'number, number': function numberNumber(x, y) {
-          return nearlyEqual$1(x, y, config.epsilon);
-        },
-        'BigNumber, BigNumber': function BigNumberBigNumber(x, y) {
-          return x.eq(y) || nearlyEqual(x, y, config.epsilon);
-        },
-        'Fraction, Fraction': function FractionFraction(x, y) {
-          return x.equals(y);
-        },
-        'Complex, Complex': function ComplexComplex(x, y) {
-          return complexEquals(x, y, config.epsilon);
-        }
-      }, compareUnits);
-    });
-    factory(name$g, ['typed', 'config'], _ref2 => {
-      var {
-        typed,
-        config
-      } = _ref2;
-      return typed(name$g, {
-        'number, number': function numberNumber(x, y) {
-          return nearlyEqual$1(x, y, config.epsilon);
-        }
-      });
-    });
-
-    var name$f = 'SparseMatrix';
-    var dependencies$f = ['typed', 'equalScalar', 'Matrix'];
-    var createSparseMatrixClass = /* #__PURE__ */factory(name$f, dependencies$f, _ref => {
-      var {
-        typed,
-        equalScalar,
-        Matrix
-      } = _ref;
-      /**
-       * Sparse Matrix implementation. This type implements
-       * a [Compressed Column Storage](https://en.wikipedia.org/wiki/Sparse_matrix#Compressed_sparse_column_(CSC_or_CCS))
-       * format for two-dimensional sparse matrices.
-       * @class SparseMatrix
-       */
-      function SparseMatrix(data, datatype) {
-        if (!(this instanceof SparseMatrix)) {
-          throw new SyntaxError('Constructor must be called with the new operator');
-        }
-        if (datatype && !isString(datatype)) {
-          throw new Error('Invalid datatype: ' + datatype);
-        }
-        if (isMatrix(data)) {
-          // create from matrix
-          _createFromMatrix(this, data, datatype);
-        } else if (data && isArray(data.index) && isArray(data.ptr) && isArray(data.size)) {
-          // initialize fields
-          this._values = data.values;
-          this._index = data.index;
-          this._ptr = data.ptr;
-          this._size = data.size;
-          this._datatype = datatype || data.datatype;
-        } else if (isArray(data)) {
-          // create from array
-          _createFromArray(this, data, datatype);
-        } else if (data) {
-          // unsupported type
-          throw new TypeError('Unsupported type of data (' + typeOf(data) + ')');
-        } else {
-          // nothing provided
-          this._values = [];
-          this._index = [];
-          this._ptr = [0];
-          this._size = [0, 0];
-          this._datatype = datatype;
-        }
-      }
-      function _createFromMatrix(matrix, source, datatype) {
-        // check matrix type
-        if (source.type === 'SparseMatrix') {
-          // clone arrays
-          matrix._values = source._values ? clone$1(source._values) : undefined;
-          matrix._index = clone$1(source._index);
-          matrix._ptr = clone$1(source._ptr);
-          matrix._size = clone$1(source._size);
-          matrix._datatype = datatype || source._datatype;
-        } else {
-          // build from matrix data
-          _createFromArray(matrix, source.valueOf(), datatype || source._datatype);
-        }
-      }
-      function _createFromArray(matrix, data, datatype) {
-        // initialize fields
-        matrix._values = [];
-        matrix._index = [];
-        matrix._ptr = [];
-        matrix._datatype = datatype;
-        // discover rows & columns, do not use math.size() to avoid looping array twice
-        var rows = data.length;
-        var columns = 0;
-
-        // equal signature to use
-        var eq = equalScalar;
-        // zero value
-        var zero = 0;
-        if (isString(datatype)) {
-          // find signature that matches (datatype, datatype)
-          eq = typed.find(equalScalar, [datatype, datatype]) || equalScalar;
-          // convert 0 to the same datatype
-          zero = typed.convert(0, datatype);
-        }
-
-        // check we have rows (empty array)
-        if (rows > 0) {
-          // column index
-          var j = 0;
-          do {
-            // store pointer to values index
-            matrix._ptr.push(matrix._index.length);
-            // loop rows
-            for (var i = 0; i < rows; i++) {
-              // current row
-              var row = data[i];
-              // check row is an array
-              if (isArray(row)) {
-                // update columns if needed (only on first column)
-                if (j === 0 && columns < row.length) {
-                  columns = row.length;
-                }
-                // check row has column
-                if (j < row.length) {
-                  // value
-                  var v = row[j];
-                  // check value != 0
-                  if (!eq(v, zero)) {
-                    // store value
-                    matrix._values.push(v);
-                    // index
-                    matrix._index.push(i);
-                  }
-                }
-              } else {
-                // update columns if needed (only on first column)
-                if (j === 0 && columns < 1) {
-                  columns = 1;
-                }
-                // check value != 0 (row is a scalar)
-                if (!eq(row, zero)) {
-                  // store value
-                  matrix._values.push(row);
-                  // index
-                  matrix._index.push(i);
-                }
-              }
-            }
-            // increment index
-            j++;
-          } while (j < columns);
-        }
-        // store number of values in ptr
-        matrix._ptr.push(matrix._index.length);
-        // size
-        matrix._size = [rows, columns];
-      }
-      SparseMatrix.prototype = new Matrix();
-
-      /**
-       * Create a new SparseMatrix
-       */
-      SparseMatrix.prototype.createSparseMatrix = function (data, datatype) {
-        return new SparseMatrix(data, datatype);
-      };
-
-      /**
-       * Attach type information
-       */
-      Object.defineProperty(SparseMatrix, 'name', {
-        value: 'SparseMatrix'
-      });
-      SparseMatrix.prototype.constructor = SparseMatrix;
-      SparseMatrix.prototype.type = 'SparseMatrix';
-      SparseMatrix.prototype.isSparseMatrix = true;
-
-      /**
-       * Get the matrix type
-       *
-       * Usage:
-       *    const matrixType = matrix.getDataType()  // retrieves the matrix type
-       *
-       * @memberOf SparseMatrix
-       * @return {string}   type information; if multiple types are found from the Matrix, it will return "mixed"
-       */
-      SparseMatrix.prototype.getDataType = function () {
-        return getArrayDataType(this._values, typeOf);
-      };
-
-      /**
-       * Get the storage format used by the matrix.
-       *
-       * Usage:
-       *     const format = matrix.storage()   // retrieve storage format
-       *
-       * @memberof SparseMatrix
-       * @return {string}           The storage format.
-       */
-      SparseMatrix.prototype.storage = function () {
-        return 'sparse';
-      };
-
-      /**
-       * Get the datatype of the data stored in the matrix.
-       *
-       * Usage:
-       *     const format = matrix.datatype()    // retrieve matrix datatype
-       *
-       * @memberof SparseMatrix
-       * @return {string}           The datatype.
-       */
-      SparseMatrix.prototype.datatype = function () {
-        return this._datatype;
-      };
-
-      /**
-       * Create a new SparseMatrix
-       * @memberof SparseMatrix
-       * @param {Array} data
-       * @param {string} [datatype]
-       */
-      SparseMatrix.prototype.create = function (data, datatype) {
-        return new SparseMatrix(data, datatype);
-      };
-
-      /**
-       * Get the matrix density.
-       *
-       * Usage:
-       *     const density = matrix.density()                   // retrieve matrix density
-       *
-       * @memberof SparseMatrix
-       * @return {number}           The matrix density.
-       */
-      SparseMatrix.prototype.density = function () {
-        // rows & columns
-        var rows = this._size[0];
-        var columns = this._size[1];
-        // calculate density
-        return rows !== 0 && columns !== 0 ? this._index.length / (rows * columns) : 0;
-      };
-
-      /**
-       * Get a subset of the matrix, or replace a subset of the matrix.
-       *
-       * Usage:
-       *     const subset = matrix.subset(index)               // retrieve subset
-       *     const value = matrix.subset(index, replacement)   // replace subset
-       *
-       * @memberof SparseMatrix
-       * @param {Index} index
-       * @param {Array | Matrix | *} [replacement]
-       * @param {*} [defaultValue=0]      Default value, filled in on new entries when
-       *                                  the matrix is resized. If not provided,
-       *                                  new matrix elements will be filled with zeros.
-       */
-      SparseMatrix.prototype.subset = function (index, replacement, defaultValue) {
-        // check it is a pattern matrix
-        if (!this._values) {
-          throw new Error('Cannot invoke subset on a Pattern only matrix');
-        }
-
-        // check arguments
-        switch (arguments.length) {
-          case 1:
-            return _getsubset(this, index);
-
-          // intentional fall through
-          case 2:
-          case 3:
-            return _setsubset(this, index, replacement, defaultValue);
-          default:
-            throw new SyntaxError('Wrong number of arguments');
-        }
-      };
-      function _getsubset(matrix, idx) {
-        // check idx
-        if (!isIndex(idx)) {
-          throw new TypeError('Invalid index');
-        }
-        var isScalar = idx.isScalar();
-        if (isScalar) {
-          // return a scalar
-          return matrix.get(idx.min());
-        }
-        // validate dimensions
-        var size = idx.size();
-        if (size.length !== matrix._size.length) {
-          throw new DimensionError(size.length, matrix._size.length);
-        }
-
-        // vars
-        var i, ii, k, kk;
-
-        // validate if any of the ranges in the index is out of range
-        var min = idx.min();
-        var max = idx.max();
-        for (i = 0, ii = matrix._size.length; i < ii; i++) {
-          validateIndex(min[i], matrix._size[i]);
-          validateIndex(max[i], matrix._size[i]);
-        }
-
-        // matrix arrays
-        var mvalues = matrix._values;
-        var mindex = matrix._index;
-        var mptr = matrix._ptr;
-
-        // rows & columns dimensions for result matrix
-        var rows = idx.dimension(0);
-        var columns = idx.dimension(1);
-
-        // workspace & permutation vector
-        var w = [];
-        var pv = [];
-
-        // loop rows in resulting matrix
-        rows.forEach(function (i, r) {
-          // update permutation vector
-          pv[i] = r[0];
-          // mark i in workspace
-          w[i] = true;
-        });
-
-        // result matrix arrays
-        var values = mvalues ? [] : undefined;
-        var index = [];
-        var ptr = [];
-
-        // loop columns in result matrix
-        columns.forEach(function (j) {
-          // update ptr
-          ptr.push(index.length);
-          // loop values in column j
-          for (k = mptr[j], kk = mptr[j + 1]; k < kk; k++) {
-            // row
-            i = mindex[k];
-            // check row is in result matrix
-            if (w[i] === true) {
-              // push index
-              index.push(pv[i]);
-              // check we need to process values
-              if (values) {
-                values.push(mvalues[k]);
-              }
-            }
-          }
-        });
-        // update ptr
-        ptr.push(index.length);
-
-        // return matrix
-        return new SparseMatrix({
-          values,
-          index,
-          ptr,
-          size,
-          datatype: matrix._datatype
-        });
-      }
-      function _setsubset(matrix, index, submatrix, defaultValue) {
-        // check index
-        if (!index || index.isIndex !== true) {
-          throw new TypeError('Invalid index');
-        }
-
-        // get index size and check whether the index contains a single value
-        var iSize = index.size();
-        var isScalar = index.isScalar();
-
-        // calculate the size of the submatrix, and convert it into an Array if needed
-        var sSize;
-        if (isMatrix(submatrix)) {
-          // submatrix size
-          sSize = submatrix.size();
-          // use array representation
-          submatrix = submatrix.toArray();
-        } else {
-          // get submatrix size (array, scalar)
-          sSize = arraySize(submatrix);
-        }
-
-        // check index is a scalar
-        if (isScalar) {
-          // verify submatrix is a scalar
-          if (sSize.length !== 0) {
-            throw new TypeError('Scalar expected');
-          }
-          // set value
-          matrix.set(index.min(), submatrix, defaultValue);
-        } else {
-          // validate dimensions, index size must be one or two dimensions
-          if (iSize.length !== 1 && iSize.length !== 2) {
-            throw new DimensionError(iSize.length, matrix._size.length, '<');
-          }
-
-          // check submatrix and index have the same dimensions
-          if (sSize.length < iSize.length) {
-            // calculate number of missing outer dimensions
-            var i = 0;
-            var outer = 0;
-            while (iSize[i] === 1 && sSize[i] === 1) {
-              i++;
-            }
-            while (iSize[i] === 1) {
-              outer++;
-              i++;
-            }
-            // unsqueeze both outer and inner dimensions
-            submatrix = unsqueeze(submatrix, iSize.length, outer, sSize);
-          }
-
-          // check whether the size of the submatrix matches the index size
-          if (!deepStrictEqual(iSize, sSize)) {
-            throw new DimensionError(iSize, sSize, '>');
-          }
-
-          // insert the sub matrix
-          if (iSize.length === 1) {
-            // if the replacement index only has 1 dimension, go trough each one and set its value
-            var range = index.dimension(0);
-            range.forEach(function (dataIndex, subIndex) {
-              validateIndex(dataIndex);
-              matrix.set([dataIndex, 0], submatrix[subIndex[0]], defaultValue);
-            });
-          } else {
-            // if the replacement index has 2 dimensions, go through each one and set the value in the correct index
-            var firstDimensionRange = index.dimension(0);
-            var secondDimensionRange = index.dimension(1);
-            firstDimensionRange.forEach(function (firstDataIndex, firstSubIndex) {
-              validateIndex(firstDataIndex);
-              secondDimensionRange.forEach(function (secondDataIndex, secondSubIndex) {
-                validateIndex(secondDataIndex);
-                matrix.set([firstDataIndex, secondDataIndex], submatrix[firstSubIndex[0]][secondSubIndex[0]], defaultValue);
-              });
-            });
-          }
-        }
-        return matrix;
-      }
-
-      /**
-       * Get a single element from the matrix.
-       * @memberof SparseMatrix
-       * @param {number[]} index   Zero-based index
-       * @return {*} value
-       */
-      SparseMatrix.prototype.get = function (index) {
-        if (!isArray(index)) {
-          throw new TypeError('Array expected');
-        }
-        if (index.length !== this._size.length) {
-          throw new DimensionError(index.length, this._size.length);
-        }
-
-        // check it is a pattern matrix
-        if (!this._values) {
-          throw new Error('Cannot invoke get on a Pattern only matrix');
-        }
-
-        // row and column
-        var i = index[0];
-        var j = index[1];
-
-        // check i, j are valid
-        validateIndex(i, this._size[0]);
-        validateIndex(j, this._size[1]);
-
-        // find value index
-        var k = _getValueIndex(i, this._ptr[j], this._ptr[j + 1], this._index);
-        // check k is prior to next column k and it is in the correct row
-        if (k < this._ptr[j + 1] && this._index[k] === i) {
-          return this._values[k];
-        }
-        return 0;
-      };
-
-      /**
-       * Replace a single element in the matrix.
-       * @memberof SparseMatrix
-       * @param {number[]} index   Zero-based index
-       * @param {*} v
-       * @param {*} [defaultValue]        Default value, filled in on new entries when
-       *                                  the matrix is resized. If not provided,
-       *                                  new matrix elements will be set to zero.
-       * @return {SparseMatrix} self
-       */
-      SparseMatrix.prototype.set = function (index, v, defaultValue) {
-        if (!isArray(index)) {
-          throw new TypeError('Array expected');
-        }
-        if (index.length !== this._size.length) {
-          throw new DimensionError(index.length, this._size.length);
-        }
-
-        // check it is a pattern matrix
-        if (!this._values) {
-          throw new Error('Cannot invoke set on a Pattern only matrix');
-        }
-
-        // row and column
-        var i = index[0];
-        var j = index[1];
-
-        // rows & columns
-        var rows = this._size[0];
-        var columns = this._size[1];
-
-        // equal signature to use
-        var eq = equalScalar;
-        // zero value
-        var zero = 0;
-        if (isString(this._datatype)) {
-          // find signature that matches (datatype, datatype)
-          eq = typed.find(equalScalar, [this._datatype, this._datatype]) || equalScalar;
-          // convert 0 to the same datatype
-          zero = typed.convert(0, this._datatype);
-        }
-
-        // check we need to resize matrix
-        if (i > rows - 1 || j > columns - 1) {
-          // resize matrix
-          _resize(this, Math.max(i + 1, rows), Math.max(j + 1, columns), defaultValue);
-          // update rows & columns
-          rows = this._size[0];
-          columns = this._size[1];
-        }
-
-        // check i, j are valid
-        validateIndex(i, rows);
-        validateIndex(j, columns);
-
-        // find value index
-        var k = _getValueIndex(i, this._ptr[j], this._ptr[j + 1], this._index);
-        // check k is prior to next column k and it is in the correct row
-        if (k < this._ptr[j + 1] && this._index[k] === i) {
-          // check value != 0
-          if (!eq(v, zero)) {
-            // update value
-            this._values[k] = v;
-          } else {
-            // remove value from matrix
-            _remove(k, j, this._values, this._index, this._ptr);
-          }
-        } else {
-          // insert value @ (i, j)
-          _insert(k, i, j, v, this._values, this._index, this._ptr);
-        }
-        return this;
-      };
-      function _getValueIndex(i, top, bottom, index) {
-        // check row is on the bottom side
-        if (bottom - top === 0) {
-          return bottom;
-        }
-        // loop rows [top, bottom[
-        for (var r = top; r < bottom; r++) {
-          // check we found value index
-          if (index[r] === i) {
-            return r;
-          }
-        }
-        // we did not find row
-        return top;
-      }
-      function _remove(k, j, values, index, ptr) {
-        // remove value @ k
-        values.splice(k, 1);
-        index.splice(k, 1);
-        // update pointers
-        for (var x = j + 1; x < ptr.length; x++) {
-          ptr[x]--;
-        }
-      }
-      function _insert(k, i, j, v, values, index, ptr) {
-        // insert value
-        values.splice(k, 0, v);
-        // update row for k
-        index.splice(k, 0, i);
-        // update column pointers
-        for (var x = j + 1; x < ptr.length; x++) {
-          ptr[x]++;
-        }
-      }
-
-      /**
-       * Resize the matrix to the given size. Returns a copy of the matrix when
-       * `copy=true`, otherwise return the matrix itself (resize in place).
-       *
-       * @memberof SparseMatrix
-       * @param {number[] | Matrix} size  The new size the matrix should have.
-       *                                  Since sparse matrices are always two-dimensional,
-       *                                  size must be two numbers in either an array or a matrix
-       * @param {*} [defaultValue=0]      Default value, filled in on new entries.
-       *                                  If not provided, the matrix elements will
-       *                                  be filled with zeros.
-       * @param {boolean} [copy]          Return a resized copy of the matrix
-       *
-       * @return {Matrix}                 The resized matrix
-       */
-      SparseMatrix.prototype.resize = function (size, defaultValue, copy) {
-        // validate arguments
-        if (!isCollection(size)) {
-          throw new TypeError('Array or Matrix expected');
-        }
-
-        // SparseMatrix input is always 2d, flatten this into 1d if it's indeed a vector
-        var sizeArray = size.valueOf().map(value => {
-          return Array.isArray(value) && value.length === 1 ? value[0] : value;
-        });
-        if (sizeArray.length !== 2) {
-          throw new Error('Only two dimensions matrix are supported');
-        }
-
-        // check sizes
-        sizeArray.forEach(function (value) {
-          if (!isNumber(value) || !isInteger(value) || value < 0) {
-            throw new TypeError('Invalid size, must contain positive integers ' + '(size: ' + format(sizeArray) + ')');
-          }
-        });
-
-        // matrix to resize
-        var m = copy ? this.clone() : this;
-        // resize matrix
-        return _resize(m, sizeArray[0], sizeArray[1], defaultValue);
-      };
-      function _resize(matrix, rows, columns, defaultValue) {
-        // value to insert at the time of growing matrix
-        var value = defaultValue || 0;
-
-        // equal signature to use
-        var eq = equalScalar;
-        // zero value
-        var zero = 0;
-        if (isString(matrix._datatype)) {
-          // find signature that matches (datatype, datatype)
-          eq = typed.find(equalScalar, [matrix._datatype, matrix._datatype]) || equalScalar;
-          // convert 0 to the same datatype
-          zero = typed.convert(0, matrix._datatype);
-          // convert value to the same datatype
-          value = typed.convert(value, matrix._datatype);
-        }
-
-        // should we insert the value?
-        var ins = !eq(value, zero);
-
-        // old columns and rows
-        var r = matrix._size[0];
-        var c = matrix._size[1];
-        var i, j, k;
-
-        // check we need to increase columns
-        if (columns > c) {
-          // loop new columns
-          for (j = c; j < columns; j++) {
-            // update matrix._ptr for current column
-            matrix._ptr[j] = matrix._values.length;
-            // check we need to insert matrix._values
-            if (ins) {
-              // loop rows
-              for (i = 0; i < r; i++) {
-                // add new matrix._values
-                matrix._values.push(value);
-                // update matrix._index
-                matrix._index.push(i);
-              }
-            }
-          }
-          // store number of matrix._values in matrix._ptr
-          matrix._ptr[columns] = matrix._values.length;
-        } else if (columns < c) {
-          // truncate matrix._ptr
-          matrix._ptr.splice(columns + 1, c - columns);
-          // truncate matrix._values and matrix._index
-          matrix._values.splice(matrix._ptr[columns], matrix._values.length);
-          matrix._index.splice(matrix._ptr[columns], matrix._index.length);
-        }
-        // update columns
-        c = columns;
-
-        // check we need to increase rows
-        if (rows > r) {
-          // check we have to insert values
-          if (ins) {
-            // inserts
-            var n = 0;
-            // loop columns
-            for (j = 0; j < c; j++) {
-              // update matrix._ptr for current column
-              matrix._ptr[j] = matrix._ptr[j] + n;
-              // where to insert matrix._values
-              k = matrix._ptr[j + 1] + n;
-              // pointer
-              var p = 0;
-              // loop new rows, initialize pointer
-              for (i = r; i < rows; i++, p++) {
-                // add value
-                matrix._values.splice(k + p, 0, value);
-                // update matrix._index
-                matrix._index.splice(k + p, 0, i);
-                // increment inserts
-                n++;
-              }
-            }
-            // store number of matrix._values in matrix._ptr
-            matrix._ptr[c] = matrix._values.length;
-          }
-        } else if (rows < r) {
-          // deletes
-          var d = 0;
-          // loop columns
-          for (j = 0; j < c; j++) {
-            // update matrix._ptr for current column
-            matrix._ptr[j] = matrix._ptr[j] - d;
-            // where matrix._values start for next column
-            var k0 = matrix._ptr[j];
-            var k1 = matrix._ptr[j + 1] - d;
-            // loop matrix._index
-            for (k = k0; k < k1; k++) {
-              // row
-              i = matrix._index[k];
-              // check we need to delete value and matrix._index
-              if (i > rows - 1) {
-                // remove value
-                matrix._values.splice(k, 1);
-                // remove item from matrix._index
-                matrix._index.splice(k, 1);
-                // increase deletes
-                d++;
-              }
-            }
-          }
-          // update matrix._ptr for current column
-          matrix._ptr[j] = matrix._values.length;
-        }
-        // update matrix._size
-        matrix._size[0] = rows;
-        matrix._size[1] = columns;
-        // return matrix
-        return matrix;
-      }
-
-      /**
-       * Reshape the matrix to the given size. Returns a copy of the matrix when
-       * `copy=true`, otherwise return the matrix itself (reshape in place).
-       *
-       * NOTE: This might be better suited to copy by default, instead of modifying
-       *       in place. For now, it operates in place to remain consistent with
-       *       resize().
-       *
-       * @memberof SparseMatrix
-       * @param {number[]} sizes          The new size the matrix should have.
-       *                                  Since sparse matrices are always two-dimensional,
-       *                                  size must be two numbers in either an array or a matrix
-       * @param {boolean} [copy]          Return a reshaped copy of the matrix
-       *
-       * @return {Matrix}                 The reshaped matrix
-       */
-      SparseMatrix.prototype.reshape = function (sizes, copy) {
-        // validate arguments
-        if (!isArray(sizes)) {
-          throw new TypeError('Array expected');
-        }
-        if (sizes.length !== 2) {
-          throw new Error('Sparse matrices can only be reshaped in two dimensions');
-        }
-
-        // check sizes
-        sizes.forEach(function (value) {
-          if (!isNumber(value) || !isInteger(value) || value <= -2 || value === 0) {
-            throw new TypeError('Invalid size, must contain positive integers or -1 ' + '(size: ' + format(sizes) + ')');
-          }
-        });
-        var currentLength = this._size[0] * this._size[1];
-        sizes = processSizesWildcard(sizes, currentLength);
-        var newLength = sizes[0] * sizes[1];
-
-        // m * n must not change
-        if (currentLength !== newLength) {
-          throw new Error('Reshaping sparse matrix will result in the wrong number of elements');
-        }
-
-        // matrix to reshape
-        var m = copy ? this.clone() : this;
-
-        // return unchanged if the same shape
-        if (this._size[0] === sizes[0] && this._size[1] === sizes[1]) {
-          return m;
-        }
-
-        // Convert to COO format (generate a column index)
-        var colIndex = [];
-        for (var i = 0; i < m._ptr.length; i++) {
-          for (var j = 0; j < m._ptr[i + 1] - m._ptr[i]; j++) {
-            colIndex.push(i);
-          }
-        }
-
-        // Clone the values array
-        var values = m._values.slice();
-
-        // Clone the row index array
-        var rowIndex = m._index.slice();
-
-        // Transform the (row, column) indices
-        for (var _i = 0; _i < m._index.length; _i++) {
-          var r1 = rowIndex[_i];
-          var c1 = colIndex[_i];
-          var flat = r1 * m._size[1] + c1;
-          colIndex[_i] = flat % sizes[1];
-          rowIndex[_i] = Math.floor(flat / sizes[1]);
-        }
-
-        // Now reshaping is supposed to preserve the row-major order, BUT these sparse matrices are stored
-        // in column-major order, so we have to reorder the value array now. One option is to use a multisort,
-        // sorting several arrays based on some other array.
-
-        // OR, we could easily just:
-
-        // 1. Remove all values from the matrix
-        m._values.length = 0;
-        m._index.length = 0;
-        m._ptr.length = sizes[1] + 1;
-        m._size = sizes.slice();
-        for (var _i2 = 0; _i2 < m._ptr.length; _i2++) {
-          m._ptr[_i2] = 0;
-        }
-
-        // 2. Re-insert all elements in the proper order (simplified code from SparseMatrix.prototype.set)
-        // This step is probably the most time-consuming
-        for (var h = 0; h < values.length; h++) {
-          var _i3 = rowIndex[h];
-          var _j = colIndex[h];
-          var v = values[h];
-          var k = _getValueIndex(_i3, m._ptr[_j], m._ptr[_j + 1], m._index);
-          _insert(k, _i3, _j, v, m._values, m._index, m._ptr);
-        }
-
-        // The value indices are inserted out of order, but apparently that's... still OK?
-
-        return m;
-      };
-
-      /**
-       * Create a clone of the matrix
-       * @memberof SparseMatrix
-       * @return {SparseMatrix} clone
-       */
-      SparseMatrix.prototype.clone = function () {
-        var m = new SparseMatrix({
-          values: this._values ? clone$1(this._values) : undefined,
-          index: clone$1(this._index),
-          ptr: clone$1(this._ptr),
-          size: clone$1(this._size),
-          datatype: this._datatype
-        });
-        return m;
-      };
-
-      /**
-       * Retrieve the size of the matrix.
-       * @memberof SparseMatrix
-       * @returns {number[]} size
-       */
-      SparseMatrix.prototype.size = function () {
-        return this._size.slice(0); // copy the Array
-      };
-
-      /**
-       * Create a new matrix with the results of the callback function executed on
-       * each entry of the matrix.
-       * @memberof SparseMatrix
-       * @param {Function} callback   The callback function is invoked with three
-       *                              parameters: the value of the element, the index
-       *                              of the element, and the Matrix being traversed.
-       * @param {boolean} [skipZeros] Invoke callback function for non-zero values only.
-       *
-       * @return {SparseMatrix} matrix
-       */
-      SparseMatrix.prototype.map = function (callback, skipZeros) {
-        // check it is a pattern matrix
-        if (!this._values) {
-          throw new Error('Cannot invoke map on a Pattern only matrix');
-        }
-        // matrix instance
-        var me = this;
-        // rows and columns
-        var rows = this._size[0];
-        var columns = this._size[1];
-        // invoke callback
-        var args = maxArgumentCount(callback);
-        var invoke = function invoke(v, i, j) {
-          // invoke callback
-          if (args === 1) return callback(v);
-          if (args === 2) return callback(v, [i, j]);
-          return callback(v, [i, j], me);
-        };
-        // invoke _map
-        return _map(this, 0, rows - 1, 0, columns - 1, invoke, skipZeros);
-      };
-
-      /**
-       * Create a new matrix with the results of the callback function executed on the interval
-       * [minRow..maxRow, minColumn..maxColumn].
-       */
-      function _map(matrix, minRow, maxRow, minColumn, maxColumn, callback, skipZeros) {
-        // result arrays
-        var values = [];
-        var index = [];
-        var ptr = [];
-
-        // equal signature to use
-        var eq = equalScalar;
-        // zero value
-        var zero = 0;
-        if (isString(matrix._datatype)) {
-          // find signature that matches (datatype, datatype)
-          eq = typed.find(equalScalar, [matrix._datatype, matrix._datatype]) || equalScalar;
-          // convert 0 to the same datatype
-          zero = typed.convert(0, matrix._datatype);
-        }
-
-        // invoke callback
-        var invoke = function invoke(v, x, y) {
-          // invoke callback
-          v = callback(v, x, y);
-          // check value != 0
-          if (!eq(v, zero)) {
-            // store value
-            values.push(v);
-            // index
-            index.push(x);
-          }
-        };
-        // loop columns
-        for (var j = minColumn; j <= maxColumn; j++) {
-          // store pointer to values index
-          ptr.push(values.length);
-          // k0 <= k < k1 where k0 = _ptr[j] && k1 = _ptr[j+1]
-          var k0 = matrix._ptr[j];
-          var k1 = matrix._ptr[j + 1];
-          if (skipZeros) {
-            // loop k within [k0, k1[
-            for (var k = k0; k < k1; k++) {
-              // row index
-              var i = matrix._index[k];
-              // check i is in range
-              if (i >= minRow && i <= maxRow) {
-                // value @ k
-                invoke(matrix._values[k], i - minRow, j - minColumn);
-              }
-            }
-          } else {
-            // create a cache holding all defined values
-            var _values = {};
-            for (var _k = k0; _k < k1; _k++) {
-              var _i4 = matrix._index[_k];
-              _values[_i4] = matrix._values[_k];
-            }
-
-            // loop over all rows (indexes can be unordered so we can't use that),
-            // and either read the value or zero
-            for (var _i5 = minRow; _i5 <= maxRow; _i5++) {
-              var value = _i5 in _values ? _values[_i5] : 0;
-              invoke(value, _i5 - minRow, j - minColumn);
-            }
-          }
-        }
-
-        // store number of values in ptr
-        ptr.push(values.length);
-        // return sparse matrix
-        return new SparseMatrix({
-          values,
-          index,
-          ptr,
-          size: [maxRow - minRow + 1, maxColumn - minColumn + 1]
-        });
-      }
-
-      /**
-       * Execute a callback function on each entry of the matrix.
-       * @memberof SparseMatrix
-       * @param {Function} callback   The callback function is invoked with three
-       *                              parameters: the value of the element, the index
-       *                              of the element, and the Matrix being traversed.
-       * @param {boolean} [skipZeros] Invoke callback function for non-zero values only.
-       *                              If false, the indices are guaranteed to be in order,
-       *                              if true, the indices can be unordered.
-       */
-      SparseMatrix.prototype.forEach = function (callback, skipZeros) {
-        // check it is a pattern matrix
-        if (!this._values) {
-          throw new Error('Cannot invoke forEach on a Pattern only matrix');
-        }
-        // matrix instance
-        var me = this;
-        // rows and columns
-        var rows = this._size[0];
-        var columns = this._size[1];
-        // loop columns
-        for (var j = 0; j < columns; j++) {
-          // k0 <= k < k1 where k0 = _ptr[j] && k1 = _ptr[j+1]
-          var k0 = this._ptr[j];
-          var k1 = this._ptr[j + 1];
-          if (skipZeros) {
-            // loop k within [k0, k1[
-            for (var k = k0; k < k1; k++) {
-              // row index
-              var i = this._index[k];
-
-              // value @ k
-              callback(this._values[k], [i, j], me);
-            }
-          } else {
-            // create a cache holding all defined values
-            var values = {};
-            for (var _k2 = k0; _k2 < k1; _k2++) {
-              var _i6 = this._index[_k2];
-              values[_i6] = this._values[_k2];
-            }
-
-            // loop over all rows (indexes can be unordered so we can't use that),
-            // and either read the value or zero
-            for (var _i7 = 0; _i7 < rows; _i7++) {
-              var value = _i7 in values ? values[_i7] : 0;
-              callback(value, [_i7, j], me);
-            }
-          }
-        }
-      };
-
-      /**
-       * Iterate over the matrix elements, skipping zeros
-       * @return {Iterable<{ value, index: number[] }>}
-       */
-      SparseMatrix.prototype[Symbol.iterator] = function* () {
-        if (!this._values) {
-          throw new Error('Cannot iterate a Pattern only matrix');
-        }
-        var columns = this._size[1];
-        for (var j = 0; j < columns; j++) {
-          var k0 = this._ptr[j];
-          var k1 = this._ptr[j + 1];
-          for (var k = k0; k < k1; k++) {
-            // row index
-            var i = this._index[k];
-            yield {
-              value: this._values[k],
-              index: [i, j]
-            };
-          }
-        }
-      };
-
-      /**
-       * Create an Array with a copy of the data of the SparseMatrix
-       * @memberof SparseMatrix
-       * @returns {Array} array
-       */
-      SparseMatrix.prototype.toArray = function () {
-        return _toArray(this._values, this._index, this._ptr, this._size, true);
-      };
-
-      /**
-       * Get the primitive value of the SparseMatrix: a two dimensions array
-       * @memberof SparseMatrix
-       * @returns {Array} array
-       */
-      SparseMatrix.prototype.valueOf = function () {
-        return _toArray(this._values, this._index, this._ptr, this._size, false);
-      };
-      function _toArray(values, index, ptr, size, copy) {
-        // rows and columns
-        var rows = size[0];
-        var columns = size[1];
-        // result
-        var a = [];
-        // vars
-        var i, j;
-        // initialize array
-        for (i = 0; i < rows; i++) {
-          a[i] = [];
-          for (j = 0; j < columns; j++) {
-            a[i][j] = 0;
-          }
-        }
-
-        // loop columns
-        for (j = 0; j < columns; j++) {
-          // k0 <= k < k1 where k0 = _ptr[j] && k1 = _ptr[j+1]
-          var k0 = ptr[j];
-          var k1 = ptr[j + 1];
-          // loop k within [k0, k1[
-          for (var k = k0; k < k1; k++) {
-            // row index
-            i = index[k];
-            // set value (use one for pattern matrix)
-            a[i][j] = values ? copy ? clone$1(values[k]) : values[k] : 1;
-          }
-        }
-        return a;
-      }
-
-      /**
-       * Get a string representation of the matrix, with optional formatting options.
-       * @memberof SparseMatrix
-       * @param {Object | number | Function} [options]  Formatting options. See
-       *                                                lib/utils/number:format for a
-       *                                                description of the available
-       *                                                options.
-       * @returns {string} str
-       */
-      SparseMatrix.prototype.format = function (options) {
-        // rows and columns
-        var rows = this._size[0];
-        var columns = this._size[1];
-        // density
-        var density = this.density();
-        // rows & columns
-        var str = 'Sparse Matrix [' + format(rows, options) + ' x ' + format(columns, options) + '] density: ' + format(density, options) + '\n';
-        // loop columns
-        for (var j = 0; j < columns; j++) {
-          // k0 <= k < k1 where k0 = _ptr[j] && k1 = _ptr[j+1]
-          var k0 = this._ptr[j];
-          var k1 = this._ptr[j + 1];
-          // loop k within [k0, k1[
-          for (var k = k0; k < k1; k++) {
-            // row index
-            var i = this._index[k];
-            // append value
-            str += '\n    (' + format(i, options) + ', ' + format(j, options) + ') ==> ' + (this._values ? format(this._values[k], options) : 'X');
-          }
-        }
-        return str;
-      };
-
-      /**
-       * Get a string representation of the matrix
-       * @memberof SparseMatrix
-       * @returns {string} str
-       */
-      SparseMatrix.prototype.toString = function () {
-        return format(this.toArray());
-      };
-
-      /**
-       * Get a JSON representation of the matrix
-       * @memberof SparseMatrix
-       * @returns {Object}
-       */
-      SparseMatrix.prototype.toJSON = function () {
-        return {
-          mathjs: 'SparseMatrix',
-          values: this._values,
-          index: this._index,
-          ptr: this._ptr,
-          size: this._size,
-          datatype: this._datatype
-        };
-      };
-
-      /**
-       * Get the kth Matrix diagonal.
-       *
-       * @memberof SparseMatrix
-       * @param {number | BigNumber} [k=0]     The kth diagonal where the vector will retrieved.
-       *
-       * @returns {Matrix}                     The matrix vector with the diagonal values.
-       */
-      SparseMatrix.prototype.diagonal = function (k) {
-        // validate k if any
-        if (k) {
-          // convert BigNumber to a number
-          if (isBigNumber(k)) {
-            k = k.toNumber();
-          }
-          // is must be an integer
-          if (!isNumber(k) || !isInteger(k)) {
-            throw new TypeError('The parameter k must be an integer number');
-          }
-        } else {
-          // default value
-          k = 0;
-        }
-        var kSuper = k > 0 ? k : 0;
-        var kSub = k < 0 ? -k : 0;
-
-        // rows & columns
-        var rows = this._size[0];
-        var columns = this._size[1];
-
-        // number diagonal values
-        var n = Math.min(rows - kSub, columns - kSuper);
-
-        // diagonal arrays
-        var values = [];
-        var index = [];
-        var ptr = [];
-        // initial ptr value
-        ptr[0] = 0;
-        // loop columns
-        for (var j = kSuper; j < columns && values.length < n; j++) {
-          // k0 <= k < k1 where k0 = _ptr[j] && k1 = _ptr[j+1]
-          var k0 = this._ptr[j];
-          var k1 = this._ptr[j + 1];
-          // loop x within [k0, k1[
-          for (var x = k0; x < k1; x++) {
-            // row index
-            var i = this._index[x];
-            // check row
-            if (i === j - kSuper + kSub) {
-              // value on this column
-              values.push(this._values[x]);
-              // store row
-              index[values.length - 1] = i - kSub;
-              // exit loop
-              break;
-            }
-          }
-        }
-        // close ptr
-        ptr.push(values.length);
-        // return matrix
-        return new SparseMatrix({
-          values,
-          index,
-          ptr,
-          size: [n, 1]
-        });
-      };
-
-      /**
-       * Generate a matrix from a JSON object
-       * @memberof SparseMatrix
-       * @param {Object} json  An object structured like
-       *                       `{"mathjs": "SparseMatrix", "values": [], "index": [], "ptr": [], "size": []}`,
-       *                       where mathjs is optional
-       * @returns {SparseMatrix}
-       */
-      SparseMatrix.fromJSON = function (json) {
-        return new SparseMatrix(json);
-      };
-
-      /**
-       * Create a diagonal matrix.
-       *
-       * @memberof SparseMatrix
-       * @param {Array} size                       The matrix size.
-       * @param {number | Array | Matrix } value   The values for the diagonal.
-       * @param {number | BigNumber} [k=0]         The kth diagonal where the vector will be filled in.
-       * @param {number} [defaultValue]            The default value for non-diagonal
-       * @param {string} [datatype]                The Matrix datatype, values must be of this datatype.
-       *
-       * @returns {SparseMatrix}
-       */
-      SparseMatrix.diagonal = function (size, value, k, defaultValue, datatype) {
-        if (!isArray(size)) {
-          throw new TypeError('Array expected, size parameter');
-        }
-        if (size.length !== 2) {
-          throw new Error('Only two dimensions matrix are supported');
-        }
-
-        // map size & validate
-        size = size.map(function (s) {
-          // check it is a big number
-          if (isBigNumber(s)) {
-            // convert it
-            s = s.toNumber();
-          }
-          // validate arguments
-          if (!isNumber(s) || !isInteger(s) || s < 1) {
-            throw new Error('Size values must be positive integers');
-          }
-          return s;
-        });
-
-        // validate k if any
-        if (k) {
-          // convert BigNumber to a number
-          if (isBigNumber(k)) {
-            k = k.toNumber();
-          }
-          // is must be an integer
-          if (!isNumber(k) || !isInteger(k)) {
-            throw new TypeError('The parameter k must be an integer number');
-          }
-        } else {
-          // default value
-          k = 0;
-        }
-
-        // equal signature to use
-        var eq = equalScalar;
-        // zero value
-        var zero = 0;
-        if (isString(datatype)) {
-          // find signature that matches (datatype, datatype)
-          eq = typed.find(equalScalar, [datatype, datatype]) || equalScalar;
-          // convert 0 to the same datatype
-          zero = typed.convert(0, datatype);
-        }
-        var kSuper = k > 0 ? k : 0;
-        var kSub = k < 0 ? -k : 0;
-
-        // rows and columns
-        var rows = size[0];
-        var columns = size[1];
-
-        // number of non-zero items
-        var n = Math.min(rows - kSub, columns - kSuper);
-
-        // value extraction function
-        var _value;
-
-        // check value
-        if (isArray(value)) {
-          // validate array
-          if (value.length !== n) {
-            // number of values in array must be n
-            throw new Error('Invalid value array length');
-          }
-          // define function
-          _value = function _value(i) {
-            // return value @ i
-            return value[i];
-          };
-        } else if (isMatrix(value)) {
-          // matrix size
-          var ms = value.size();
-          // validate matrix
-          if (ms.length !== 1 || ms[0] !== n) {
-            // number of values in array must be n
-            throw new Error('Invalid matrix length');
-          }
-          // define function
-          _value = function _value(i) {
-            // return value @ i
-            return value.get([i]);
-          };
-        } else {
-          // define function
-          _value = function _value() {
-            // return value
-            return value;
-          };
-        }
-
-        // create arrays
-        var values = [];
-        var index = [];
-        var ptr = [];
-
-        // loop items
-        for (var j = 0; j < columns; j++) {
-          // number of rows with value
-          ptr.push(values.length);
-          // diagonal index
-          var i = j - kSuper;
-          // check we need to set diagonal value
-          if (i >= 0 && i < n) {
-            // get value @ i
-            var v = _value(i);
-            // check for zero
-            if (!eq(v, zero)) {
-              // column
-              index.push(i + kSub);
-              // add value
-              values.push(v);
-            }
-          }
-        }
-        // last value should be number of values
-        ptr.push(values.length);
-        // create SparseMatrix
-        return new SparseMatrix({
-          values,
-          index,
-          ptr,
-          size: [rows, columns]
-        });
-      };
-
-      /**
-       * Swap rows i and j in Matrix.
-       *
-       * @memberof SparseMatrix
-       * @param {number} i       Matrix row index 1
-       * @param {number} j       Matrix row index 2
-       *
-       * @return {Matrix}        The matrix reference
-       */
-      SparseMatrix.prototype.swapRows = function (i, j) {
-        // check index
-        if (!isNumber(i) || !isInteger(i) || !isNumber(j) || !isInteger(j)) {
-          throw new Error('Row index must be positive integers');
-        }
-        // check dimensions
-        if (this._size.length !== 2) {
-          throw new Error('Only two dimensional matrix is supported');
-        }
-        // validate index
-        validateIndex(i, this._size[0]);
-        validateIndex(j, this._size[0]);
-
-        // swap rows
-        SparseMatrix._swapRows(i, j, this._size[1], this._values, this._index, this._ptr);
-        // return current instance
-        return this;
-      };
-
-      /**
-       * Loop rows with data in column j.
-       *
-       * @param {number} j            Column
-       * @param {Array} values        Matrix values
-       * @param {Array} index         Matrix row indeces
-       * @param {Array} ptr           Matrix column pointers
-       * @param {Function} callback   Callback function invoked for every row in column j
-       */
-      SparseMatrix._forEachRow = function (j, values, index, ptr, callback) {
-        // indeces for column j
-        var k0 = ptr[j];
-        var k1 = ptr[j + 1];
-        // loop
-        for (var k = k0; k < k1; k++) {
-          // invoke callback
-          callback(index[k], values[k]);
-        }
-      };
-
-      /**
-       * Swap rows x and y in Sparse Matrix data structures.
-       *
-       * @param {number} x         Matrix row index 1
-       * @param {number} y         Matrix row index 2
-       * @param {number} columns   Number of columns in matrix
-       * @param {Array} values     Matrix values
-       * @param {Array} index      Matrix row indeces
-       * @param {Array} ptr        Matrix column pointers
-       */
-      SparseMatrix._swapRows = function (x, y, columns, values, index, ptr) {
-        // loop columns
-        for (var j = 0; j < columns; j++) {
-          // k0 <= k < k1 where k0 = _ptr[j] && k1 = _ptr[j+1]
-          var k0 = ptr[j];
-          var k1 = ptr[j + 1];
-          // find value index @ x
-          var kx = _getValueIndex(x, k0, k1, index);
-          // find value index @ x
-          var ky = _getValueIndex(y, k0, k1, index);
-          // check both rows exist in matrix
-          if (kx < k1 && ky < k1 && index[kx] === x && index[ky] === y) {
-            // swap values (check for pattern matrix)
-            if (values) {
-              var v = values[kx];
-              values[kx] = values[ky];
-              values[ky] = v;
-            }
-            // next column
-            continue;
-          }
-          // check x row exist & no y row
-          if (kx < k1 && index[kx] === x && (ky >= k1 || index[ky] !== y)) {
-            // value @ x (check for pattern matrix)
-            var vx = values ? values[kx] : undefined;
-            // insert value @ y
-            index.splice(ky, 0, y);
-            if (values) {
-              values.splice(ky, 0, vx);
-            }
-            // remove value @ x (adjust array index if needed)
-            index.splice(ky <= kx ? kx + 1 : kx, 1);
-            if (values) {
-              values.splice(ky <= kx ? kx + 1 : kx, 1);
-            }
-            // next column
-            continue;
-          }
-          // check y row exist & no x row
-          if (ky < k1 && index[ky] === y && (kx >= k1 || index[kx] !== x)) {
-            // value @ y (check for pattern matrix)
-            var vy = values ? values[ky] : undefined;
-            // insert value @ x
-            index.splice(kx, 0, x);
-            if (values) {
-              values.splice(kx, 0, vy);
-            }
-            // remove value @ y (adjust array index if needed)
-            index.splice(kx <= ky ? ky + 1 : ky, 1);
-            if (values) {
-              values.splice(kx <= ky ? ky + 1 : ky, 1);
-            }
-          }
-        }
-      };
-      return SparseMatrix;
-    }, {
-      isClass: true
-    });
-
-    var name$e = 'number';
-    var dependencies$e = ['typed'];
-
-    /**
-     * Separates the radix, integer part, and fractional part of a non decimal number string
-     * @param {string} input string to parse
-     * @returns {object} the parts of the string or null if not a valid input
-     */
-    function getNonDecimalNumberParts(input) {
-      var nonDecimalWithRadixMatch = input.match(/(0[box])([0-9a-fA-F]*)\.([0-9a-fA-F]*)/);
-      if (nonDecimalWithRadixMatch) {
-        var radix = {
-          '0b': 2,
-          '0o': 8,
-          '0x': 16
-        }[nonDecimalWithRadixMatch[1]];
-        var integerPart = nonDecimalWithRadixMatch[2];
-        var fractionalPart = nonDecimalWithRadixMatch[3];
-        return {
-          input,
-          radix,
-          integerPart,
-          fractionalPart
-        };
-      } else {
-        return null;
-      }
-    }
-
-    /**
-     * Makes a number from a radix, and integer part, and a fractional part
-     * @param {parts} [x] parts of the number string (from getNonDecimalNumberParts)
-     * @returns {number} the number
-     */
-    function makeNumberFromNonDecimalParts(parts) {
-      var n = parseInt(parts.integerPart, parts.radix);
-      var f = 0;
-      for (var i = 0; i < parts.fractionalPart.length; i++) {
-        var digitValue = parseInt(parts.fractionalPart[i], parts.radix);
-        f += digitValue / Math.pow(parts.radix, i + 1);
-      }
-      var result = n + f;
-      if (isNaN(result)) {
-        throw new SyntaxError('String "' + parts.input + '" is no valid number');
-      }
-      return result;
-    }
-    var createNumber = /* #__PURE__ */factory(name$e, dependencies$e, _ref => {
+    notNumber.signature = n1;
+
+    var name = 'not';
+    var dependencies = ['typed'];
+    var createNot = /* #__PURE__ */factory(name, dependencies, _ref => {
       var {
         typed
       } = _ref;
       /**
-       * Create a number or convert a string, boolean, or unit to a number.
-       * When value is a matrix, all elements will be converted to number.
-       *
-       * Syntax:
-       *
-       *    math.number(value)
-       *    math.number(unit, valuelessUnit)
-       *
-       * Examples:
-       *
-       *    math.number(2)                         // returns number 2
-       *    math.number('7.2')                     // returns number 7.2
-       *    math.number(true)                      // returns number 1
-       *    math.number([true, false, true, true]) // returns [1, 0, 1, 1]
-       *    math.number(math.unit('52cm'), 'm')    // returns 0.52
-       *
-       * See also:
-       *
-       *    bignumber, boolean, complex, index, matrix, string, unit
-       *
-       * @param {string | number | BigNumber | Fraction | boolean | Array | Matrix | Unit | null} [value]  Value to be converted
-       * @param {Unit | string} [valuelessUnit] A valueless unit, used to convert a unit to a number
-       * @return {number | Array | Matrix} The created number
-       */
-      var number = typed('number', {
-        '': function _() {
-          return 0;
-        },
-        number: function number(x) {
-          return x;
-        },
-        string: function string(x) {
-          if (x === 'NaN') return NaN;
-          var nonDecimalNumberParts = getNonDecimalNumberParts(x);
-          if (nonDecimalNumberParts) {
-            return makeNumberFromNonDecimalParts(nonDecimalNumberParts);
-          }
-          var size = 0;
-          var wordSizeSuffixMatch = x.match(/(0[box][0-9a-fA-F]*)i([0-9]*)/);
-          if (wordSizeSuffixMatch) {
-            // x includes a size suffix like 0xffffi32, so we extract
-            // the suffix and remove it from x
-            size = Number(wordSizeSuffixMatch[2]);
-            x = wordSizeSuffixMatch[1];
-          }
-          var num = Number(x);
-          if (isNaN(num)) {
-            throw new SyntaxError('String "' + x + '" is no valid number');
-          }
-          if (wordSizeSuffixMatch) {
-            // x is a signed bin, oct, or hex literal
-            // num is the value of string x if x is interpreted as unsigned
-            if (num > 2 ** size - 1) {
-              // literal is too large for size suffix
-              throw new SyntaxError("String \"".concat(x, "\" is out of range"));
-            }
-            // check if the bit at index size - 1 is set and if so do the twos complement
-            if (num >= 2 ** (size - 1)) {
-              num = num - 2 ** size;
-            }
-          }
-          return num;
-        },
-        BigNumber: function BigNumber(x) {
-          return x.toNumber();
-        },
-        Fraction: function Fraction(x) {
-          return x.valueOf();
-        },
-        Unit: function Unit(x) {
-          throw new Error('Second argument with valueless unit expected');
-        },
-        null: function _null(x) {
-          return 0;
-        },
-        'Unit, string | Unit': function UnitStringUnit(unit, valuelessUnit) {
-          return unit.toNumber(valuelessUnit);
-        },
-        'Array | Matrix': typed.referToSelf(self => x => deepMap(x, self))
-      });
-
-      // reviver function to parse a JSON object like:
-      //
-      //     {"mathjs":"number","value":"2.3"}
-      //
-      // into a number 2.3
-      number.fromJSON = function (json) {
-        return parseFloat(json.value);
-      };
-      return number;
-    });
-
-    var name$d = 'bignumber';
-    var dependencies$d = ['typed', 'BigNumber'];
-    var createBignumber = /* #__PURE__ */factory(name$d, dependencies$d, _ref => {
-      var {
-        typed,
-        BigNumber
-      } = _ref;
-      /**
-       * Create a BigNumber, which can store numbers with arbitrary precision.
-       * When a matrix is provided, all elements will be converted to BigNumber.
-       *
-       * Syntax:
-       *
-       *    math.bignumber(x)
-       *
-       * Examples:
-       *
-       *    0.1 + 0.2                                  // returns number 0.30000000000000004
-       *    math.bignumber(0.1) + math.bignumber(0.2)  // returns BigNumber 0.3
-       *
-       *
-       *    7.2e500                                    // returns number Infinity
-       *    math.bignumber('7.2e500')                  // returns BigNumber 7.2e500
-       *
-       * See also:
-       *
-       *    boolean, complex, index, matrix, string, unit
-       *
-       * @param {number | string | Fraction | BigNumber | Array | Matrix | boolean | null} [value]  Value for the big number,
-       *                                                    0 by default.
-       * @returns {BigNumber} The created bignumber
-       */
-      return typed('bignumber', {
-        '': function _() {
-          return new BigNumber(0);
-        },
-        number: function number(x) {
-          // convert to string to prevent errors in case of >15 digits
-          return new BigNumber(x + '');
-        },
-        string: function string(x) {
-          var wordSizeSuffixMatch = x.match(/(0[box][0-9a-fA-F]*)i([0-9]*)/);
-          if (wordSizeSuffixMatch) {
-            // x has a word size suffix
-            var size = wordSizeSuffixMatch[2];
-            var n = BigNumber(wordSizeSuffixMatch[1]);
-            var twoPowSize = new BigNumber(2).pow(Number(size));
-            if (n.gt(twoPowSize.sub(1))) {
-              throw new SyntaxError("String \"".concat(x, "\" is out of range"));
-            }
-            var twoPowSizeSubOne = new BigNumber(2).pow(Number(size) - 1);
-            if (n.gte(twoPowSizeSubOne)) {
-              return n.sub(twoPowSize);
-            } else {
-              return n;
-            }
-          }
-          return new BigNumber(x);
-        },
-        BigNumber: function BigNumber(x) {
-          // we assume a BigNumber is immutable
-          return x;
-        },
-        Fraction: function Fraction(x) {
-          return new BigNumber(x.n).div(x.d).times(x.s);
-        },
-        null: function _null(x) {
-          return new BigNumber(0);
-        },
-        'Array | Matrix': typed.referToSelf(self => x => deepMap(x, self))
-      });
-    });
-
-    var name$c = 'fraction';
-    var dependencies$c = ['typed', 'Fraction'];
-    var createFraction = /* #__PURE__ */factory(name$c, dependencies$c, _ref => {
-      var {
-        typed,
-        Fraction
-      } = _ref;
-      /**
-       * Create a fraction or convert a value to a fraction.
-       *
-       * With one numeric argument, produces the closest rational approximation to the
-       * input.
-       * With two arguments, the first is the numerator and the second is the denominator,
-       * and creates the corresponding fraction. Both numerator and denominator must be
-       * integers.
-       * With one object argument, looks for the integer numerator as the value of property
-       * 'n' and the integer denominator as the value of property 'd'.
-       * With a matrix argument, creates a matrix of the same shape with entries
-       * converted into fractions.
-       *
-       * Syntax:
-       *     math.fraction(value)
-       *     math.fraction(numerator, denominator)
-       *     math.fraction({n: numerator, d: denominator})
-       *     math.fraction(matrix: Array | Matrix)
-       *
-       * Examples:
-       *
-       *     math.fraction(6.283)             // returns Fraction 6283/1000
-       *     math.fraction(1, 3)              // returns Fraction 1/3
-       *     math.fraction('2/3')             // returns Fraction 2/3
-       *     math.fraction({n: 2, d: 3})      // returns Fraction 2/3
-       *     math.fraction([0.2, 0.25, 1.25]) // returns Array [1/5, 1/4, 5/4]
-       *     math.fraction(4, 5.1)            // throws Error: Parameters must be integer
-       *
-       * See also:
-       *
-       *    bignumber, number, string, unit
-       *
-       * @param {number | string | Fraction | BigNumber | Array | Matrix} [args]
-       *            Arguments specifying the value, or numerator and denominator of
-       *            the fraction
-       * @return {Fraction | Array | Matrix} Returns a fraction
-       */
-      return typed('fraction', {
-        number: function number(x) {
-          if (!isFinite(x) || isNaN(x)) {
-            throw new Error(x + ' cannot be represented as a fraction');
-          }
-          return new Fraction(x);
-        },
-        string: function string(x) {
-          return new Fraction(x);
-        },
-        'number, number': function numberNumber(numerator, denominator) {
-          return new Fraction(numerator, denominator);
-        },
-        null: function _null(x) {
-          return new Fraction(0);
-        },
-        BigNumber: function BigNumber(x) {
-          return new Fraction(x.toString());
-        },
-        Fraction: function Fraction(x) {
-          return x; // fractions are immutable
-        },
-
-        Object: function Object(x) {
-          return new Fraction(x);
-        },
-        'Array | Matrix': typed.referToSelf(self => x => deepMap(x, self))
-      });
-    });
-
-    var name$b = 'matrix';
-    var dependencies$b = ['typed', 'Matrix', 'DenseMatrix', 'SparseMatrix'];
-    var createMatrix = /* #__PURE__ */factory(name$b, dependencies$b, _ref => {
-      var {
-        typed,
-        Matrix,
-        DenseMatrix,
-        SparseMatrix
-      } = _ref;
-      /**
-       * Create a Matrix. The function creates a new `math.Matrix` object from
-       * an `Array`. A Matrix has utility functions to manipulate the data in the
-       * matrix, like getting the size and getting or setting values in the matrix.
-       * Supported storage formats are 'dense' and 'sparse'.
-       *
-       * Syntax:
-       *
-       *    math.matrix()                         // creates an empty matrix using default storage format (dense).
-       *    math.matrix(data)                     // creates a matrix with initial data using default storage format (dense).
-       *    math.matrix('dense')                  // creates an empty matrix using the given storage format.
-       *    math.matrix(data, 'dense')            // creates a matrix with initial data using the given storage format.
-       *    math.matrix(data, 'sparse')           // creates a sparse matrix with initial data.
-       *    math.matrix(data, 'sparse', 'number') // creates a sparse matrix with initial data, number data type.
-       *
-       * Examples:
-       *
-       *    let m = math.matrix([[1, 2], [3, 4]])
-       *    m.size()                        // Array [2, 2]
-       *    m.resize([3, 2], 5)
-       *    m.valueOf()                     // Array [[1, 2], [3, 4], [5, 5]]
-       *    m.get([1, 0])                    // number 3
-       *
-       * See also:
-       *
-       *    bignumber, boolean, complex, index, number, string, unit, sparse
-       *
-       * @param {Array | Matrix} [data]    A multi dimensional array
-       * @param {string} [format]          The Matrix storage format, either `'dense'` or `'sparse'`
-       * @param {string} [datatype]        Type of the values
-       *
-       * @return {Matrix} The created matrix
-       */
-      return typed(name$b, {
-        '': function _() {
-          return _create([]);
-        },
-        string: function string(format) {
-          return _create([], format);
-        },
-        'string, string': function stringString(format, datatype) {
-          return _create([], format, datatype);
-        },
-        Array: function Array(data) {
-          return _create(data);
-        },
-        Matrix: function Matrix(data) {
-          return _create(data, data.storage());
-        },
-        'Array | Matrix, string': _create,
-        'Array | Matrix, string, string': _create
-      });
-
-      /**
-       * Create a new Matrix with given storage format
-       * @param {Array} data
-       * @param {string} [format]
-       * @param {string} [datatype]
-       * @returns {Matrix} Returns a new Matrix
-       * @private
-       */
-      function _create(data, format, datatype) {
-        // get storage format constructor
-        if (format === 'dense' || format === 'default' || format === undefined) {
-          return new DenseMatrix(data, datatype);
-        }
-        if (format === 'sparse') {
-          return new SparseMatrix(data, datatype);
-        }
-        throw new TypeError('Unknown matrix type ' + JSON.stringify(format) + '.');
-      }
-    });
-
-    var name$a = 'addScalar';
-    var dependencies$a = ['typed'];
-    var createAddScalar = /* #__PURE__ */factory(name$a, dependencies$a, _ref => {
-      var {
-        typed
-      } = _ref;
-      /**
-       * Add two scalar values, `x + y`.
-       * This function is meant for internal use: it is used by the public function
-       * `add`
-       *
-       * This function does not support collections (Array or Matrix).
-       *
-       * @param  {number | BigNumber | Fraction | Complex | Unit} x   First value to add
-       * @param  {number | BigNumber | Fraction | Complex} y          Second value to add
-       * @return {number | BigNumber | Fraction | Complex | Unit}     Sum of `x` and `y`
-       * @private
-       */
-      return typed(name$a, {
-        'number, number': addNumber,
-        'Complex, Complex': function ComplexComplex(x, y) {
-          return x.add(y);
-        },
-        'BigNumber, BigNumber': function BigNumberBigNumber(x, y) {
-          return x.plus(y);
-        },
-        'Fraction, Fraction': function FractionFraction(x, y) {
-          return x.add(y);
-        },
-        'Unit, Unit': typed.referToSelf(self => (x, y) => {
-          if (x.value === null || x.value === undefined) {
-            throw new Error('Parameter x contains a unit with undefined value');
-          }
-          if (y.value === null || y.value === undefined) {
-            throw new Error('Parameter y contains a unit with undefined value');
-          }
-          if (!x.equalBase(y)) throw new Error('Units do not match');
-          var res = x.clone();
-          res.value = typed.find(self, [res.valueType(), y.valueType()])(res.value, y.value);
-          res.fixPrefix = false;
-          return res;
-        })
-      });
-    });
-
-    var name$9 = 'matAlgo14xDs';
-    var dependencies$9 = ['typed'];
-    var createMatAlgo14xDs = /* #__PURE__ */factory(name$9, dependencies$9, _ref => {
-      var {
-        typed
-      } = _ref;
-      /**
-       * Iterates over DenseMatrix items and invokes the callback function f(Aij..z, b).
-       * Callback function invoked MxN times.
-       *
-       * C(i,j,...z) = f(Aij..z, b)
-       *
-       * @param {Matrix}   a                 The DenseMatrix instance (A)
-       * @param {Scalar}   b                 The Scalar value
-       * @param {Function} callback          The f(Aij..z,b) operation to invoke
-       * @param {boolean}  inverse           A true value indicates callback should be invoked f(b,Aij..z)
-       *
-       * @return {Matrix}                    DenseMatrix (C)
-       *
-       * https://github.com/josdejong/mathjs/pull/346#issuecomment-97659042
-       */
-      return function matAlgo14xDs(a, b, callback, inverse) {
-        // a arrays
-        var adata = a._data;
-        var asize = a._size;
-        var adt = a._datatype;
-
-        // datatype
-        var dt;
-        // callback signature to use
-        var cf = callback;
-
-        // process data types
-        if (typeof adt === 'string') {
-          // datatype
-          dt = adt;
-          // convert b to the same datatype
-          b = typed.convert(b, dt);
-          // callback
-          cf = typed.find(callback, [dt, dt]);
-        }
-
-        // populate cdata, iterate through dimensions
-        var cdata = asize.length > 0 ? _iterate(cf, 0, asize, asize[0], adata, b, inverse) : [];
-
-        // c matrix
-        return a.createDenseMatrix({
-          data: cdata,
-          size: clone$1(asize),
-          datatype: dt
-        });
-      };
-
-      // recursive function
-      function _iterate(f, level, s, n, av, bv, inverse) {
-        // initialize array for this level
-        var cv = [];
-        // check we reach the last level
-        if (level === s.length - 1) {
-          // loop arrays in last level
-          for (var i = 0; i < n; i++) {
-            // invoke callback and store value
-            cv[i] = inverse ? f(bv, av[i]) : f(av[i], bv);
-          }
-        } else {
-          // iterate current level
-          for (var j = 0; j < n; j++) {
-            // iterate next level
-            cv[j] = _iterate(f, level + 1, s, s[level + 1], av[j], bv, inverse);
-          }
-        }
-        return cv;
-      }
-    });
-
-    var name$8 = 'matAlgo01xDSid';
-    var dependencies$8 = ['typed'];
-    var createMatAlgo01xDSid = /* #__PURE__ */factory(name$8, dependencies$8, _ref => {
-      var {
-        typed
-      } = _ref;
-      /**
-       * Iterates over SparseMatrix nonzero items and invokes the callback function f(Dij, Sij).
-       * Callback function invoked NNZ times (number of nonzero items in SparseMatrix).
-       *
-       *
-       *          ┌  f(Dij, Sij)  ; S(i,j) !== 0
-       * C(i,j) = ┤
-       *          └  Dij          ; otherwise
-       *
-       *
-       * @param {Matrix}   denseMatrix       The DenseMatrix instance (D)
-       * @param {Matrix}   sparseMatrix      The SparseMatrix instance (S)
-       * @param {Function} callback          The f(Dij,Sij) operation to invoke, where Dij = DenseMatrix(i,j) and Sij = SparseMatrix(i,j)
-       * @param {boolean}  inverse           A true value indicates callback should be invoked f(Sij,Dij)
-       *
-       * @return {Matrix}                    DenseMatrix (C)
-       *
-       * see https://github.com/josdejong/mathjs/pull/346#issuecomment-97477571
-       */
-      return function algorithm1(denseMatrix, sparseMatrix, callback, inverse) {
-        // dense matrix arrays
-        var adata = denseMatrix._data;
-        var asize = denseMatrix._size;
-        var adt = denseMatrix._datatype;
-        // sparse matrix arrays
-        var bvalues = sparseMatrix._values;
-        var bindex = sparseMatrix._index;
-        var bptr = sparseMatrix._ptr;
-        var bsize = sparseMatrix._size;
-        var bdt = sparseMatrix._datatype;
-
-        // validate dimensions
-        if (asize.length !== bsize.length) {
-          throw new DimensionError(asize.length, bsize.length);
-        }
-
-        // check rows & columns
-        if (asize[0] !== bsize[0] || asize[1] !== bsize[1]) {
-          throw new RangeError('Dimension mismatch. Matrix A (' + asize + ') must match Matrix B (' + bsize + ')');
-        }
-
-        // sparse matrix cannot be a Pattern matrix
-        if (!bvalues) {
-          throw new Error('Cannot perform operation on Dense Matrix and Pattern Sparse Matrix');
-        }
-
-        // rows & columns
-        var rows = asize[0];
-        var columns = asize[1];
-
-        // process data types
-        var dt = typeof adt === 'string' && adt === bdt ? adt : undefined;
-        // callback function
-        var cf = dt ? typed.find(callback, [dt, dt]) : callback;
-
-        // vars
-        var i, j;
-
-        // result (DenseMatrix)
-        var cdata = [];
-        // initialize c
-        for (i = 0; i < rows; i++) {
-          cdata[i] = [];
-        }
-
-        // workspace
-        var x = [];
-        // marks indicating we have a value in x for a given column
-        var w = [];
-
-        // loop columns in b
-        for (j = 0; j < columns; j++) {
-          // column mark
-          var mark = j + 1;
-          // values in column j
-          for (var k0 = bptr[j], k1 = bptr[j + 1], k = k0; k < k1; k++) {
-            // row
-            i = bindex[k];
-            // update workspace
-            x[i] = inverse ? cf(bvalues[k], adata[i][j]) : cf(adata[i][j], bvalues[k]);
-            // mark i as updated
-            w[i] = mark;
-          }
-          // loop rows
-          for (i = 0; i < rows; i++) {
-            // check row is in workspace
-            if (w[i] === mark) {
-              // c[i][j] was already calculated
-              cdata[i][j] = x[i];
-            } else {
-              // item does not exist in S
-              cdata[i][j] = adata[i][j];
-            }
-          }
-        }
-
-        // return dense matrix
-        return denseMatrix.createDenseMatrix({
-          data: cdata,
-          size: [rows, columns],
-          datatype: dt
-        });
-      };
-    });
-
-    var name$7 = 'matAlgo04xSidSid';
-    var dependencies$7 = ['typed', 'equalScalar'];
-    var createMatAlgo04xSidSid = /* #__PURE__ */factory(name$7, dependencies$7, _ref => {
-      var {
-        typed,
-        equalScalar
-      } = _ref;
-      /**
-       * Iterates over SparseMatrix A and SparseMatrix B nonzero items and invokes the callback function f(Aij, Bij).
-       * Callback function invoked MAX(NNZA, NNZB) times
-       *
-       *
-       *          ┌  f(Aij, Bij)  ; A(i,j) !== 0 && B(i,j) !== 0
-       * C(i,j) = ┤  A(i,j)       ; A(i,j) !== 0 && B(i,j) === 0
-       *          └  B(i,j)       ; A(i,j) === 0
-       *
-       *
-       * @param {Matrix}   a                 The SparseMatrix instance (A)
-       * @param {Matrix}   b                 The SparseMatrix instance (B)
-       * @param {Function} callback          The f(Aij,Bij) operation to invoke
-       *
-       * @return {Matrix}                    SparseMatrix (C)
-       *
-       * see https://github.com/josdejong/mathjs/pull/346#issuecomment-97620294
-       */
-      return function matAlgo04xSidSid(a, b, callback) {
-        // sparse matrix arrays
-        var avalues = a._values;
-        var aindex = a._index;
-        var aptr = a._ptr;
-        var asize = a._size;
-        var adt = a._datatype;
-        // sparse matrix arrays
-        var bvalues = b._values;
-        var bindex = b._index;
-        var bptr = b._ptr;
-        var bsize = b._size;
-        var bdt = b._datatype;
-
-        // validate dimensions
-        if (asize.length !== bsize.length) {
-          throw new DimensionError(asize.length, bsize.length);
-        }
-
-        // check rows & columns
-        if (asize[0] !== bsize[0] || asize[1] !== bsize[1]) {
-          throw new RangeError('Dimension mismatch. Matrix A (' + asize + ') must match Matrix B (' + bsize + ')');
-        }
-
-        // rows & columns
-        var rows = asize[0];
-        var columns = asize[1];
-
-        // datatype
-        var dt;
-        // equal signature to use
-        var eq = equalScalar;
-        // zero value
-        var zero = 0;
-        // callback signature to use
-        var cf = callback;
-
-        // process data types
-        if (typeof adt === 'string' && adt === bdt) {
-          // datatype
-          dt = adt;
-          // find signature that matches (dt, dt)
-          eq = typed.find(equalScalar, [dt, dt]);
-          // convert 0 to the same datatype
-          zero = typed.convert(0, dt);
-          // callback
-          cf = typed.find(callback, [dt, dt]);
-        }
-
-        // result arrays
-        var cvalues = avalues && bvalues ? [] : undefined;
-        var cindex = [];
-        var cptr = [];
-
-        // workspace
-        var xa = avalues && bvalues ? [] : undefined;
-        var xb = avalues && bvalues ? [] : undefined;
-        // marks indicating we have a value in x for a given column
-        var wa = [];
-        var wb = [];
-
-        // vars
-        var i, j, k, k0, k1;
-
-        // loop columns
-        for (j = 0; j < columns; j++) {
-          // update cptr
-          cptr[j] = cindex.length;
-          // columns mark
-          var mark = j + 1;
-          // loop A(:,j)
-          for (k0 = aptr[j], k1 = aptr[j + 1], k = k0; k < k1; k++) {
-            // row
-            i = aindex[k];
-            // update c
-            cindex.push(i);
-            // update workspace
-            wa[i] = mark;
-            // check we need to process values
-            if (xa) {
-              xa[i] = avalues[k];
-            }
-          }
-          // loop B(:,j)
-          for (k0 = bptr[j], k1 = bptr[j + 1], k = k0; k < k1; k++) {
-            // row
-            i = bindex[k];
-            // check row exists in A
-            if (wa[i] === mark) {
-              // update record in xa @ i
-              if (xa) {
-                // invoke callback
-                var v = cf(xa[i], bvalues[k]);
-                // check for zero
-                if (!eq(v, zero)) {
-                  // update workspace
-                  xa[i] = v;
-                } else {
-                  // remove mark (index will be removed later)
-                  wa[i] = null;
-                }
-              }
-            } else {
-              // update c
-              cindex.push(i);
-              // update workspace
-              wb[i] = mark;
-              // check we need to process values
-              if (xb) {
-                xb[i] = bvalues[k];
-              }
-            }
-          }
-          // check we need to process values (non pattern matrix)
-          if (xa && xb) {
-            // initialize first index in j
-            k = cptr[j];
-            // loop index in j
-            while (k < cindex.length) {
-              // row
-              i = cindex[k];
-              // check workspace has value @ i
-              if (wa[i] === mark) {
-                // push value (Aij != 0 || (Aij != 0 && Bij != 0))
-                cvalues[k] = xa[i];
-                // increment pointer
-                k++;
-              } else if (wb[i] === mark) {
-                // push value (bij != 0)
-                cvalues[k] = xb[i];
-                // increment pointer
-                k++;
-              } else {
-                // remove index @ k
-                cindex.splice(k, 1);
-              }
-            }
-          }
-        }
-        // update cptr
-        cptr[columns] = cindex.length;
-
-        // return sparse matrix
-        return a.createSparseMatrix({
-          values: cvalues,
-          index: cindex,
-          ptr: cptr,
-          size: [rows, columns],
-          datatype: dt
-        });
-      };
-    });
-
-    var name$6 = 'matAlgo10xSids';
-    var dependencies$6 = ['typed', 'DenseMatrix'];
-    var createMatAlgo10xSids = /* #__PURE__ */factory(name$6, dependencies$6, _ref => {
-      var {
-        typed,
-        DenseMatrix
-      } = _ref;
-      /**
-       * Iterates over SparseMatrix S nonzero items and invokes the callback function f(Sij, b).
-       * Callback function invoked NZ times (number of nonzero items in S).
-       *
-       *
-       *          ┌  f(Sij, b)  ; S(i,j) !== 0
-       * C(i,j) = ┤
-       *          └  b          ; otherwise
-       *
-       *
-       * @param {Matrix}   s                 The SparseMatrix instance (S)
-       * @param {Scalar}   b                 The Scalar value
-       * @param {Function} callback          The f(Aij,b) operation to invoke
-       * @param {boolean}  inverse           A true value indicates callback should be invoked f(b,Sij)
-       *
-       * @return {Matrix}                    DenseMatrix (C)
-       *
-       * https://github.com/josdejong/mathjs/pull/346#issuecomment-97626813
-       */
-      return function matAlgo10xSids(s, b, callback, inverse) {
-        // sparse matrix arrays
-        var avalues = s._values;
-        var aindex = s._index;
-        var aptr = s._ptr;
-        var asize = s._size;
-        var adt = s._datatype;
-
-        // sparse matrix cannot be a Pattern matrix
-        if (!avalues) {
-          throw new Error('Cannot perform operation on Pattern Sparse Matrix and Scalar value');
-        }
-
-        // rows & columns
-        var rows = asize[0];
-        var columns = asize[1];
-
-        // datatype
-        var dt;
-        // callback signature to use
-        var cf = callback;
-
-        // process data types
-        if (typeof adt === 'string') {
-          // datatype
-          dt = adt;
-          // convert b to the same datatype
-          b = typed.convert(b, dt);
-          // callback
-          cf = typed.find(callback, [dt, dt]);
-        }
-
-        // result arrays
-        var cdata = [];
-
-        // workspaces
-        var x = [];
-        // marks indicating we have a value in x for a given column
-        var w = [];
-
-        // loop columns
-        for (var j = 0; j < columns; j++) {
-          // columns mark
-          var mark = j + 1;
-          // values in j
-          for (var k0 = aptr[j], k1 = aptr[j + 1], k = k0; k < k1; k++) {
-            // row
-            var r = aindex[k];
-            // update workspace
-            x[r] = avalues[k];
-            w[r] = mark;
-          }
-          // loop rows
-          for (var i = 0; i < rows; i++) {
-            // initialize C on first column
-            if (j === 0) {
-              // create row array
-              cdata[i] = [];
-            }
-            // check sparse matrix has a value @ i,j
-            if (w[i] === mark) {
-              // invoke callback, update C
-              cdata[i][j] = inverse ? cf(b, x[i]) : cf(x[i], b);
-            } else {
-              // dense matrix value @ i, j
-              cdata[i][j] = b;
-            }
-          }
-        }
-
-        // return dense matrix
-        return new DenseMatrix({
-          data: cdata,
-          size: [rows, columns],
-          datatype: dt
-        });
-      };
-    });
-
-    var name$5 = 'matAlgo13xDD';
-    var dependencies$5 = ['typed'];
-    var createMatAlgo13xDD = /* #__PURE__ */factory(name$5, dependencies$5, _ref => {
-      var {
-        typed
-      } = _ref;
-      /**
-       * Iterates over DenseMatrix items and invokes the callback function f(Aij..z, Bij..z).
-       * Callback function invoked MxN times.
-       *
-       * C(i,j,...z) = f(Aij..z, Bij..z)
-       *
-       * @param {Matrix}   a                 The DenseMatrix instance (A)
-       * @param {Matrix}   b                 The DenseMatrix instance (B)
-       * @param {Function} callback          The f(Aij..z,Bij..z) operation to invoke
-       *
-       * @return {Matrix}                    DenseMatrix (C)
-       *
-       * https://github.com/josdejong/mathjs/pull/346#issuecomment-97658658
-       */
-      return function matAlgo13xDD(a, b, callback) {
-        // a arrays
-        var adata = a._data;
-        var asize = a._size;
-        var adt = a._datatype;
-        // b arrays
-        var bdata = b._data;
-        var bsize = b._size;
-        var bdt = b._datatype;
-        // c arrays
-        var csize = [];
-
-        // validate dimensions
-        if (asize.length !== bsize.length) {
-          throw new DimensionError(asize.length, bsize.length);
-        }
-
-        // validate each one of the dimension sizes
-        for (var s = 0; s < asize.length; s++) {
-          // must match
-          if (asize[s] !== bsize[s]) {
-            throw new RangeError('Dimension mismatch. Matrix A (' + asize + ') must match Matrix B (' + bsize + ')');
-          }
-          // update dimension in c
-          csize[s] = asize[s];
-        }
-
-        // datatype
-        var dt;
-        // callback signature to use
-        var cf = callback;
-
-        // process data types
-        if (typeof adt === 'string' && adt === bdt) {
-          // datatype
-          dt = adt;
-          // callback
-          cf = typed.find(callback, [dt, dt]);
-        }
-
-        // populate cdata, iterate through dimensions
-        var cdata = csize.length > 0 ? _iterate(cf, 0, csize, csize[0], adata, bdata) : [];
-
-        // c matrix
-        return a.createDenseMatrix({
-          data: cdata,
-          size: csize,
-          datatype: dt
-        });
-      };
-
-      // recursive function
-      function _iterate(f, level, s, n, av, bv) {
-        // initialize array for this level
-        var cv = [];
-        // check we reach the last level
-        if (level === s.length - 1) {
-          // loop arrays in last level
-          for (var i = 0; i < n; i++) {
-            // invoke callback and store value
-            cv[i] = f(av[i], bv[i]);
-          }
-        } else {
-          // iterate current level
-          for (var j = 0; j < n; j++) {
-            // iterate next level
-            cv[j] = _iterate(f, level + 1, s, s[level + 1], av[j], bv[j]);
-          }
-        }
-        return cv;
-      }
-    });
-
-    var name$4 = 'matrixAlgorithmSuite';
-    var dependencies$4 = ['typed', 'matrix'];
-    var createMatrixAlgorithmSuite = /* #__PURE__ */factory(name$4, dependencies$4, _ref => {
-      var {
-        typed,
-        matrix
-      } = _ref;
-      var matAlgo13xDD = createMatAlgo13xDD({
-        typed
-      });
-      var matAlgo14xDs = createMatAlgo14xDs({
-        typed
-      });
-
-      /**
-       * Return a signatures object with the usual boilerplate of
-       * matrix algorithms, based on a plain options object with the
-       * following properties:
-       *   elop: function -- the elementwise operation to use, defaults to self
-       *   SS: function -- the algorithm to apply for two sparse matrices
-       *   DS: function -- the algorithm to apply for a dense and a sparse matrix
-       *   SD: function -- algo for a sparse and a dense; defaults to SD flipped
-       *   Ss: function -- the algorithm to apply for a sparse matrix and scalar
-       *   sS: function -- algo for scalar and sparse; defaults to Ss flipped
-       *   scalar: string -- typed-function type for scalars, defaults to 'any'
-       *
-       * If Ss is not specified, no matrix-scalar signatures are generated.
-       *
-       * @param {object} options
-       * @return {Object<string, function>} signatures
-       */
-      return function matrixAlgorithmSuite(options) {
-        var elop = options.elop;
-        var SD = options.SD || options.DS;
-        var matrixSignatures;
-        if (elop) {
-          // First the dense ones
-          matrixSignatures = {
-            'DenseMatrix, DenseMatrix': (x, y) => matAlgo13xDD(x, y, elop),
-            'Array, Array': (x, y) => matAlgo13xDD(matrix(x), matrix(y), elop).valueOf(),
-            'Array, DenseMatrix': (x, y) => matAlgo13xDD(matrix(x), y, elop),
-            'DenseMatrix, Array': (x, y) => matAlgo13xDD(x, matrix(y), elop)
-          };
-          // Now incorporate sparse matrices
-          if (options.SS) {
-            matrixSignatures['SparseMatrix, SparseMatrix'] = (x, y) => options.SS(x, y, elop, false);
-          }
-          if (options.DS) {
-            matrixSignatures['DenseMatrix, SparseMatrix'] = (x, y) => options.DS(x, y, elop, false);
-            matrixSignatures['Array, SparseMatrix'] = (x, y) => options.DS(matrix(x), y, elop, false);
-          }
-          if (SD) {
-            matrixSignatures['SparseMatrix, DenseMatrix'] = (x, y) => SD(y, x, elop, true);
-            matrixSignatures['SparseMatrix, Array'] = (x, y) => SD(matrix(y), x, elop, true);
-          }
-        } else {
-          // No elop, use this
-          // First the dense ones
-          matrixSignatures = {
-            'DenseMatrix, DenseMatrix': typed.referToSelf(self => (x, y) => {
-              return matAlgo13xDD(x, y, self);
-            }),
-            'Array, Array': typed.referToSelf(self => (x, y) => {
-              return matAlgo13xDD(matrix(x), matrix(y), self).valueOf();
-            }),
-            'Array, DenseMatrix': typed.referToSelf(self => (x, y) => {
-              return matAlgo13xDD(matrix(x), y, self);
-            }),
-            'DenseMatrix, Array': typed.referToSelf(self => (x, y) => {
-              return matAlgo13xDD(x, matrix(y), self);
-            })
-          };
-          // Now incorporate sparse matrices
-          if (options.SS) {
-            matrixSignatures['SparseMatrix, SparseMatrix'] = typed.referToSelf(self => (x, y) => {
-              return options.SS(x, y, self, false);
-            });
-          }
-          if (options.DS) {
-            matrixSignatures['DenseMatrix, SparseMatrix'] = typed.referToSelf(self => (x, y) => {
-              return options.DS(x, y, self, false);
-            });
-            matrixSignatures['Array, SparseMatrix'] = typed.referToSelf(self => (x, y) => {
-              return options.DS(matrix(x), y, self, false);
-            });
-          }
-          if (SD) {
-            matrixSignatures['SparseMatrix, DenseMatrix'] = typed.referToSelf(self => (x, y) => {
-              return SD(y, x, self, true);
-            });
-            matrixSignatures['SparseMatrix, Array'] = typed.referToSelf(self => (x, y) => {
-              return SD(matrix(y), x, self, true);
-            });
-          }
-        }
-
-        // Now add the scalars
-        var scalar = options.scalar || 'any';
-        var Ds = options.Ds || options.Ss;
-        if (Ds) {
-          if (elop) {
-            matrixSignatures['DenseMatrix,' + scalar] = (x, y) => matAlgo14xDs(x, y, elop, false);
-            matrixSignatures[scalar + ', DenseMatrix'] = (x, y) => matAlgo14xDs(y, x, elop, true);
-            matrixSignatures['Array,' + scalar] = (x, y) => matAlgo14xDs(matrix(x), y, elop, false).valueOf();
-            matrixSignatures[scalar + ', Array'] = (x, y) => matAlgo14xDs(matrix(y), x, elop, true).valueOf();
-          } else {
-            matrixSignatures['DenseMatrix,' + scalar] = typed.referToSelf(self => (x, y) => {
-              return matAlgo14xDs(x, y, self, false);
-            });
-            matrixSignatures[scalar + ', DenseMatrix'] = typed.referToSelf(self => (x, y) => {
-              return matAlgo14xDs(y, x, self, true);
-            });
-            matrixSignatures['Array,' + scalar] = typed.referToSelf(self => (x, y) => {
-              return matAlgo14xDs(matrix(x), y, self, false).valueOf();
-            });
-            matrixSignatures[scalar + ', Array'] = typed.referToSelf(self => (x, y) => {
-              return matAlgo14xDs(matrix(y), x, self, true).valueOf();
-            });
-          }
-        }
-        var sS = options.sS !== undefined ? options.sS : options.Ss;
-        if (elop) {
-          if (options.Ss) {
-            matrixSignatures['SparseMatrix,' + scalar] = (x, y) => options.Ss(x, y, elop, false);
-          }
-          if (sS) {
-            matrixSignatures[scalar + ', SparseMatrix'] = (x, y) => sS(y, x, elop, true);
-          }
-        } else {
-          if (options.Ss) {
-            matrixSignatures['SparseMatrix,' + scalar] = typed.referToSelf(self => (x, y) => {
-              return options.Ss(x, y, self, false);
-            });
-          }
-          if (sS) {
-            matrixSignatures[scalar + ', SparseMatrix'] = typed.referToSelf(self => (x, y) => {
-              return sS(y, x, self, true);
-            });
-          }
-        }
-        // Also pull in the scalar signatures if the operator is a typed function
-        if (elop && elop.signatures) {
-          extend(matrixSignatures, elop.signatures);
-        }
-        return matrixSignatures;
-      };
-    });
-
-    /**
-     * Bitwise and for Bignumbers
-     *
-     * Special Cases:
-     *   N &  n =  N
-     *   n &  0 =  0
-     *   n & -1 =  n
-     *   n &  n =  n
-     *   I &  I =  I
-     *  -I & -I = -I
-     *   I & -I =  0
-     *   I &  n =  n
-     *   I & -n =  I
-     *  -I &  n =  0
-     *  -I & -n = -I
-     *
-     * @param {BigNumber} x
-     * @param {BigNumber} y
-     * @return {BigNumber} Result of `x` & `y`, is fully precise
-     * @private
-     */
-
-    /**
-     * Bitwise not
-     * @param {BigNumber} x
-     * @return {BigNumber} Result of ~`x`, fully precise
-     *
-     */
-    function bitNotBigNumber(x) {
-      if (x.isFinite() && !x.isInteger()) {
-        throw new Error('Integer expected in function bitNot');
-      }
-      var BigNumber = x.constructor;
-      var prevPrec = BigNumber.precision;
-      BigNumber.config({
-        precision: 1E9
-      });
-      var result = x.plus(new BigNumber(1));
-      result.s = -result.s || null;
-      BigNumber.config({
-        precision: prevPrec
-      });
-      return result;
-    }
-
-    /**
-     * Bitwise OR for BigNumbers
-     *
-     * Special Cases:
-     *   N |  n =  N
-     *   n |  0 =  n
-     *   n | -1 = -1
-     *   n |  n =  n
-     *   I |  I =  I
-     *  -I | -I = -I
-     *   I | -n = -1
-     *   I | -I = -1
-     *   I |  n =  I
-     *  -I |  n = -I
-     *  -I | -n = -n
-     *
-     * @param {BigNumber} x
-     * @param {BigNumber} y
-     * @return {BigNumber} Result of `x` | `y`, fully precise
-     */
-    function bitOrBigNumber(x, y) {
-      if (x.isFinite() && !x.isInteger() || y.isFinite() && !y.isInteger()) {
-        throw new Error('Integers expected in function bitOr');
-      }
-      var BigNumber = x.constructor;
-      if (x.isNaN() || y.isNaN()) {
-        return new BigNumber(NaN);
-      }
-      var negOne = new BigNumber(-1);
-      if (x.isZero() || y.eq(negOne) || x.eq(y)) {
-        return y;
-      }
-      if (y.isZero() || x.eq(negOne)) {
-        return x;
-      }
-      if (!x.isFinite() || !y.isFinite()) {
-        if (!x.isFinite() && !x.isNegative() && y.isNegative() || x.isNegative() && !y.isNegative() && !y.isFinite()) {
-          return negOne;
-        }
-        if (x.isNegative() && y.isNegative()) {
-          return x.isFinite() ? x : y;
-        }
-        return x.isFinite() ? y : x;
-      }
-      return bitwise(x, y, function (a, b) {
-        return a | b;
-      });
-    }
-
-    /**
-     * Applies bitwise function to numbers
-     * @param {BigNumber} x
-     * @param {BigNumber} y
-     * @param {function (a, b)} func
-     * @return {BigNumber}
-     */
-    function bitwise(x, y, func) {
-      var BigNumber = x.constructor;
-      var xBits, yBits;
-      var xSign = +(x.s < 0);
-      var ySign = +(y.s < 0);
-      if (xSign) {
-        xBits = decCoefficientToBinaryString(bitNotBigNumber(x));
-        for (var i = 0; i < xBits.length; ++i) {
-          xBits[i] ^= 1;
-        }
-      } else {
-        xBits = decCoefficientToBinaryString(x);
-      }
-      if (ySign) {
-        yBits = decCoefficientToBinaryString(bitNotBigNumber(y));
-        for (var _i = 0; _i < yBits.length; ++_i) {
-          yBits[_i] ^= 1;
-        }
-      } else {
-        yBits = decCoefficientToBinaryString(y);
-      }
-      var minBits, maxBits, minSign;
-      if (xBits.length <= yBits.length) {
-        minBits = xBits;
-        maxBits = yBits;
-        minSign = xSign;
-      } else {
-        minBits = yBits;
-        maxBits = xBits;
-        minSign = ySign;
-      }
-      var shortLen = minBits.length;
-      var longLen = maxBits.length;
-      var expFuncVal = func(xSign, ySign) ^ 1;
-      var outVal = new BigNumber(expFuncVal ^ 1);
-      var twoPower = new BigNumber(1);
-      var two = new BigNumber(2);
-      var prevPrec = BigNumber.precision;
-      BigNumber.config({
-        precision: 1E9
-      });
-      while (shortLen > 0) {
-        if (func(minBits[--shortLen], maxBits[--longLen]) === expFuncVal) {
-          outVal = outVal.plus(twoPower);
-        }
-        twoPower = twoPower.times(two);
-      }
-      while (longLen > 0) {
-        if (func(minSign, maxBits[--longLen]) === expFuncVal) {
-          outVal = outVal.plus(twoPower);
-        }
-        twoPower = twoPower.times(two);
-      }
-      BigNumber.config({
-        precision: prevPrec
-      });
-      if (expFuncVal === 0) {
-        outVal.s = -outVal.s;
-      }
-      return outVal;
-    }
-
-    /* Extracted from decimal.js, and edited to specialize. */
-    function decCoefficientToBinaryString(x) {
-      // Convert to string
-      var a = x.d; // array with digits
-      var r = a[0] + '';
-      for (var i = 1; i < a.length; ++i) {
-        var s = a[i] + '';
-        for (var z = 7 - s.length; z--;) {
-          s = '0' + s;
-        }
-        r += s;
-      }
-      var j = r.length;
-      while (r.charAt(j) === '0') {
-        j--;
-      }
-      var xe = x.e;
-      var str = r.slice(0, j + 1 || 1);
-      var strL = str.length;
-      if (xe > 0) {
-        if (++xe > strL) {
-          // Append zeros.
-          xe -= strL;
-          while (xe--) {
-            str += '0';
-          }
-        } else if (xe < strL) {
-          str = str.slice(0, xe) + '.' + str.slice(xe);
-        }
-      }
-
-      // Convert from base 10 (decimal) to base 2
-      var arr = [0];
-      for (var _i2 = 0; _i2 < str.length;) {
-        var arrL = arr.length;
-        while (arrL--) {
-          arr[arrL] *= 10;
-        }
-        arr[0] += parseInt(str.charAt(_i2++)); // convert to int
-        for (var _j = 0; _j < arr.length; ++_j) {
-          if (arr[_j] > 1) {
-            if (arr[_j + 1] === null || arr[_j + 1] === undefined) {
-              arr[_j + 1] = 0;
-            }
-            arr[_j + 1] += arr[_j] >> 1;
-            arr[_j] &= 1;
-          }
-        }
-      }
-      return arr.reverse();
-    }
-
-    var name$3 = 'bitOr';
-    var dependencies$3 = ['typed', 'matrix', 'equalScalar', 'DenseMatrix'];
-    var createBitOr = /* #__PURE__ */factory(name$3, dependencies$3, _ref => {
-      var {
-        typed,
-        matrix,
-        equalScalar,
-        DenseMatrix
-      } = _ref;
-      var matAlgo01xDSid = createMatAlgo01xDSid({
-        typed
-      });
-      var matAlgo04xSidSid = createMatAlgo04xSidSid({
-        typed,
-        equalScalar
-      });
-      var matAlgo10xSids = createMatAlgo10xSids({
-        typed,
-        DenseMatrix
-      });
-      var matrixAlgorithmSuite = createMatrixAlgorithmSuite({
-        typed,
-        matrix
-      });
-
-      /**
-       * Bitwise OR two values, `x | y`.
-       * For matrices, the function is evaluated element wise.
-       * For units, the function is evaluated on the lowest print base.
-       *
-       * Syntax:
-       *
-       *    math.bitOr(x, y)
-       *
-       * Examples:
-       *
-       *    math.bitOr(1, 2)               // returns number 3
-       *
-       *    math.bitOr([1, 2, 3], 4)       // returns Array [5, 6, 7]
-       *
-       * See also:
-       *
-       *    bitAnd, bitNot, bitXor, leftShift, rightArithShift, rightLogShift
-       *
-       * @param  {number | BigNumber | Array | Matrix} x First value to or
-       * @param  {number | BigNumber | Array | Matrix} y Second value to or
-       * @return {number | BigNumber | Array | Matrix} OR of `x` and `y`
-       */
-      return typed(name$3, {
-        'number, number': bitOrNumber,
-        'BigNumber, BigNumber': bitOrBigNumber
-      }, matrixAlgorithmSuite({
-        SS: matAlgo04xSidSid,
-        DS: matAlgo01xDSid,
-        Ss: matAlgo10xSids
-      }));
-    });
-
-    function noBignumber() {
-      throw new Error('No "bignumber" implementation available');
-    }
-    function noFraction() {
-      throw new Error('No "fraction" implementation available');
-    }
-
-    /**
-     * Improve error messages for statistics functions. Errors are typically
-     * thrown in an internally used function like larger, causing the error
-     * not to mention the function (like max) which is actually used by the user.
-     *
-     * @param {Error} err
-     * @param {String} fnName
-     * @param {*} [value]
-     * @return {Error}
-     */
-    function improveErrorMessage(err, fnName, value) {
-      // TODO: add information with the index (also needs transform in expression parser)
-      var details;
-      if (String(err).indexOf('Unexpected type') !== -1) {
-        details = arguments.length > 2 ? ' (type: ' + typeOf(value) + ', value: ' + JSON.stringify(value) + ')' : ' (type: ' + err.data.actual + ')';
-        return new TypeError('Cannot calculate ' + fnName + ', unexpected type of argument' + details);
-      }
-      if (String(err).indexOf('complex numbers') !== -1) {
-        details = arguments.length > 2 ? ' (type: ' + typeOf(value) + ', value: ' + JSON.stringify(value) + ')' : '';
-        return new TypeError('Cannot calculate ' + fnName + ', no ordering relation is defined for complex numbers' + details);
-      }
-      return err;
-    }
-
-    var name$2 = 'numeric';
-    var dependencies$2 = ['number', '?bignumber', '?fraction'];
-    var createNumeric = /* #__PURE__ */factory(name$2, dependencies$2, _ref => {
-      var {
-        number: _number,
-        bignumber,
-        fraction
-      } = _ref;
-      var validInputTypes = {
-        string: true,
-        number: true,
-        BigNumber: true,
-        Fraction: true
-      };
-
-      // Load the conversion functions for each output type
-      var validOutputTypes = {
-        number: x => _number(x),
-        BigNumber: bignumber ? x => bignumber(x) : noBignumber,
-        Fraction: fraction ? x => fraction(x) : noFraction
-      };
-
-      /**
-       * Convert a numeric input to a specific numeric type: number, BigNumber, or Fraction.
-       *
-       * Syntax:
-       *
-       *    math.numeric(x)
-       *
-       * Examples:
-       *
-       *    math.numeric('4')                           // returns 4
-       *    math.numeric('4', 'number')                 // returns 4
-       *    math.numeric('4', 'BigNumber')              // returns BigNumber 4
-       *    math.numeric('4', 'Fraction')               // returns Fraction 4
-       *    math.numeric(4, 'Fraction')                 // returns Fraction 4
-       *    math.numeric(math.fraction(2, 5), 'number') // returns 0.4
-       *
-       * See also:
-       *
-       *    number, fraction, bignumber, string, format
-       *
-       * @param {string | number | BigNumber | Fraction } value
-       *              A numeric value or a string containing a numeric value
-       * @param {string} outputType
-       *              Desired numeric output type.
-       *              Available values: 'number', 'BigNumber', or 'Fraction'
-       * @return {number | BigNumber | Fraction}
-       *              Returns an instance of the numeric in the requested type
-       */
-      return function numeric(value) {
-        var outputType = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 'number';
-        var check = arguments.length > 2 ? arguments[2] : undefined;
-        if (check !== undefined) {
-          throw new SyntaxError('numeric() takes one or two arguments');
-        }
-        var inputType = typeOf(value);
-        if (!(inputType in validInputTypes)) {
-          throw new TypeError('Cannot convert ' + value + ' of type "' + inputType + '"; valid input types are ' + Object.keys(validInputTypes).join(', '));
-        }
-        if (!(outputType in validOutputTypes)) {
-          throw new TypeError('Cannot convert ' + value + ' to type "' + outputType + '"; valid output types are ' + Object.keys(validOutputTypes).join(', '));
-        }
-        if (outputType === inputType) {
-          return value;
-        } else {
-          return validOutputTypes[outputType](value);
-        }
-      };
-    });
-
-    var name$1 = 'add';
-    var dependencies$1 = ['typed', 'matrix', 'addScalar', 'equalScalar', 'DenseMatrix', 'SparseMatrix'];
-    var createAdd = /* #__PURE__ */factory(name$1, dependencies$1, _ref => {
-      var {
-        typed,
-        matrix,
-        addScalar,
-        equalScalar,
-        DenseMatrix,
-        SparseMatrix
-      } = _ref;
-      var matAlgo01xDSid = createMatAlgo01xDSid({
-        typed
-      });
-      var matAlgo04xSidSid = createMatAlgo04xSidSid({
-        typed,
-        equalScalar
-      });
-      var matAlgo10xSids = createMatAlgo10xSids({
-        typed,
-        DenseMatrix
-      });
-      var matrixAlgorithmSuite = createMatrixAlgorithmSuite({
-        typed,
-        matrix
-      });
-
-      /**
-       * Add two or more values, `x + y`.
+       * Logical `not`. Flips boolean value of a given parameter.
        * For matrices, the function is evaluated element wise.
        *
        * Syntax:
        *
-       *    math.add(x, y)
-       *    math.add(x, y, z, ...)
+       *    math.not(x)
        *
        * Examples:
        *
-       *    math.add(2, 3)               // returns number 5
-       *    math.add(2, 3, 4)            // returns number 9
+       *    math.not(2)      // returns false
+       *    math.not(0)      // returns true
+       *    math.not(true)   // returns false
        *
-       *    const a = math.complex(2, 3)
-       *    const b = math.complex(-4, 1)
-       *    math.add(a, b)               // returns Complex -2 + 4i
-       *
-       *    math.add([1, 2, 3], 4)       // returns Array [5, 6, 7]
-       *
-       *    const c = math.unit('5 cm')
-       *    const d = math.unit('2.1 mm')
-       *    math.add(c, d)               // returns Unit 52.1 mm
-       *
-       *    math.add("2.3", "4")         // returns number 6.3
+       *    a = [2, -7, 0]
+       *    math.not(a)      // returns [false, false, true]
        *
        * See also:
        *
-       *    subtract, sum
+       *    and, or, xor
        *
-       * @param  {number | BigNumber | Fraction | Complex | Unit | Array | Matrix} x First value to add
-       * @param  {number | BigNumber | Fraction | Complex | Unit | Array | Matrix} y Second value to add
-       * @return {number | BigNumber | Fraction | Complex | Unit | Array | Matrix} Sum of `x` and `y`
-       */
-      return typed(name$1, {
-        'any, any': addScalar,
-        'any, any, ...any': typed.referToSelf(self => (x, y, rest) => {
-          var result = self(x, y);
-          for (var i = 0; i < rest.length; i++) {
-            result = self(result, rest[i]);
-          }
-          return result;
-        })
-      }, matrixAlgorithmSuite({
-        elop: addScalar,
-        DS: matAlgo01xDSid,
-        SS: matAlgo04xSidSid,
-        Ss: matAlgo10xSids
-      }));
-    });
-
-    var name = 'sum';
-    var dependencies = ['typed', 'config', 'add', 'numeric'];
-    var createSum = /* #__PURE__ */factory(name, dependencies, _ref => {
-      var {
-        typed,
-        config,
-        add,
-        numeric
-      } = _ref;
-      /**
-       * Compute the sum of a matrix or a list with values.
-       * In case of a (multi dimensional) array or matrix, the sum of all
-       * elements will be calculated.
-       *
-       * Syntax:
-       *
-       *     math.sum(a, b, c, ...)
-       *     math.sum(A)
-       *
-       * Examples:
-       *
-       *     math.sum(2, 1, 4, 3)               // returns 10
-       *     math.sum([2, 1, 4, 3])             // returns 10
-       *     math.sum([[2, 5], [4, 3], [1, 7]]) // returns 22
-       *
-       * See also:
-       *
-       *    mean, median, min, max, prod, std, variance, cumsum
-       *
-       * @param {... *} args  A single matrix or or multiple scalar values
-       * @return {*} The sum of all values
+       * @param  {number | BigNumber | Complex | Unit | Array | Matrix} x First value to check
+       * @return {boolean | Array | Matrix}
+       *            Returns true when input is a zero or empty value.
        */
       return typed(name, {
-        // sum([a, b, c, d, ...])
-        'Array | Matrix': _sum,
-        // sum([a, b, c, d, ...], dim)
-        'Array | Matrix, number | BigNumber': _nsumDim,
-        // sum(a, b, c, d, ...)
-        '...': function _(args) {
-          if (containsCollections(args)) {
-            throw new TypeError('Scalar values expected in function sum');
-          }
-          return _sum(args);
-        }
+        'null | undefined': () => true,
+        number: notNumber,
+        Complex: function Complex(x) {
+          return x.re === 0 && x.im === 0;
+        },
+        BigNumber: function BigNumber(x) {
+          return x.isZero() || x.isNaN();
+        },
+        Unit: typed.referToSelf(self => x => typed.find(self, x.valueType())(x.value)),
+        'Array | Matrix': typed.referToSelf(self => x => deepMap(x, self))
       });
-
-      /**
-       * Recursively calculate the sum of an n-dimensional array
-       * @param {Array | Matrix} array
-       * @return {number} sum
-       * @private
-       */
-      function _sum(array) {
-        var sum;
-        deepForEach(array, function (value) {
-          try {
-            sum = sum === undefined ? value : add(sum, value);
-          } catch (err) {
-            throw improveErrorMessage(err, 'sum', value);
-          }
-        });
-
-        // make sure returning numeric value: parse a string into a numeric value
-        if (sum === undefined) {
-          sum = numeric(0, config.number);
-        }
-        if (typeof sum === 'string') {
-          sum = numeric(sum, config.number);
-        }
-        return sum;
-      }
-      function _nsumDim(array, dim) {
-        try {
-          var sum = reduce(array, dim, add);
-          return sum;
-        } catch (err) {
-          throw improveErrorMessage(err, 'sum');
-        }
-      }
     });
 
     /**
@@ -18405,1338 +16226,21 @@ var app = (function () {
       DenseMatrix,
       Fraction
     });
-    var addScalar = /* #__PURE__ */createAddScalar({
+    var not = /* #__PURE__ */createNot({
       typed
     });
-    var bignumber = /* #__PURE__ */createBignumber({
-      BigNumber,
-      typed
-    });
-    var equalScalar = /* #__PURE__ */createEqualScalar({
-      config: config$1,
-      typed
-    });
-    var number = /* #__PURE__ */createNumber({
-      typed
-    });
-    var SparseMatrix = /* #__PURE__ */createSparseMatrixClass({
-      Matrix,
-      equalScalar,
-      typed
-    });
-    var fraction = /* #__PURE__ */createFraction({
-      Fraction,
-      typed
-    });
-    var matrix = /* #__PURE__ */createMatrix({
-      DenseMatrix,
-      Matrix,
-      SparseMatrix,
-      typed
-    });
-    var numeric = /* #__PURE__ */createNumeric({
-      bignumber,
-      fraction,
-      number
-    });
-    var add = /* #__PURE__ */createAdd({
-      DenseMatrix,
-      SparseMatrix,
-      addScalar,
-      equalScalar,
-      matrix,
-      typed
-    });
-    var sum = /* #__PURE__ */createSum({
-      add,
-      config: config$1,
-      numeric,
-      typed
-    });
-
-    /**
-     * THIS FILE IS AUTO-GENERATED
-     * DON'T MAKE CHANGES HERE
-     */
-    var BigNumberDependencies = {
-      createBigNumberClass
-    };
-
-    /**
-     * THIS FILE IS AUTO-GENERATED
-     * DON'T MAKE CHANGES HERE
-     */
-    var ComplexDependencies = {
-      createComplexClass
-    };
-
-    /**
-     * THIS FILE IS AUTO-GENERATED
-     * DON'T MAKE CHANGES HERE
-     */
-    var MatrixDependencies = {
-      createMatrixClass
-    };
-
-    /**
-     * THIS FILE IS AUTO-GENERATED
-     * DON'T MAKE CHANGES HERE
-     */
-    var DenseMatrixDependencies = {
-      MatrixDependencies,
-      createDenseMatrixClass
-    };
-
-    /**
-     * THIS FILE IS AUTO-GENERATED
-     * DON'T MAKE CHANGES HERE
-     */
-    var FractionDependencies = {
-      createFractionClass
-    };
-
-    /**
-     * THIS FILE IS AUTO-GENERATED
-     * DON'T MAKE CHANGES HERE
-     */
-    var typedDependencies = {
-      BigNumberDependencies,
-      ComplexDependencies,
-      DenseMatrixDependencies,
-      FractionDependencies,
-      createTyped
-    };
-
-    /**
-     * THIS FILE IS AUTO-GENERATED
-     * DON'T MAKE CHANGES HERE
-     */
-    var equalScalarDependencies = {
-      typedDependencies,
-      createEqualScalar
-    };
-
-    /**
-     * THIS FILE IS AUTO-GENERATED
-     * DON'T MAKE CHANGES HERE
-     */
-    var SparseMatrixDependencies = {
-      MatrixDependencies,
-      equalScalarDependencies,
-      typedDependencies,
-      createSparseMatrixClass
-    };
-
-    /**
-     * THIS FILE IS AUTO-GENERATED
-     * DON'T MAKE CHANGES HERE
-     */
-    var matrixDependencies = {
-      DenseMatrixDependencies,
-      MatrixDependencies,
-      SparseMatrixDependencies,
-      typedDependencies,
-      createMatrix
-    };
-
-    /**
-     * THIS FILE IS AUTO-GENERATED
-     * DON'T MAKE CHANGES HERE
-     */
-    var bitOrDependencies = {
-      DenseMatrixDependencies,
-      equalScalarDependencies,
-      matrixDependencies,
-      typedDependencies,
-      createBitOr
-    };
-
-    class Engine {
-        constructor(antall) {
-            this.antall = antall;
-            this.num = this.antall;
-            this.chosen_list = [];
-            this.dizes = [];
-            this.tries_left = 3;
-            this.rounds = 0;
-
-            this.points = 0;
-            this.points_detail = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-            this.bot_points = 0;
-
-            this.done = false;
-
-            this.roll_dize();
-        }
-
-        roll_dize() {
-            if(this.tries_left > 0) {
-                this.dizes = [...Array(this.num)].map(() => {return Math.floor(Math.random()*6)+1});
-                this.tries_left -= 1;
-            }
-        }
-
-        new_round() {
-            if(this.done) {
-                this.dizes = [];
-                this.chosen_list = [];
-                if(this.points > localStorage.getItem("beste")) {
-                    localStorage.setItem("beste", this.points);
-                }
-            }
-
-            this.rounds++;
-            this.tries_left = 3;
-            this.num = this.antall;
-            this.chosen_list = [];
-
-            this.roll_dize();
-        }
-
-        new_chosen(chosen) {
-            if(this.chosen_list.length >= 5) return;
-            this.chosen_list = [...this.chosen_list, chosen];
-            delete this.dizes[this.dizes.indexOf(chosen)];
-            this.dizes = this.dizes.filter(function (a) {
-                return a != null;
-            });
-            this.num--;
-        }
-
-        remove_chosen(chosen) {
-            this.dizes = [...this.dizes, chosen];
-            delete this.chosen_list[this.chosen_list.indexOf(chosen)];
-            this.chosen_list = this.chosen_list.filter(function (a) {
-                return a != null;
-            });
-            this.num++;
-        }
-
-        calculate_points(id) {
-            if(typeof id == 'number') {
-                let points = 0;
-                for(let i = 0; i < this.dizes.length; i++) {
-                    if(this.dizes[i] == id) {
-                        points += id;
-                    }
-                }
-
-                for(let i = 0; i < this.chosen_list.length; i++) {
-                    if(this.chosen_list[i] == id) {
-                        points += id;
-                    }
-                }
-                return points;
-            }
-
-            if(typeof id == 'string') {
-                switch (id) {
-                    case 'liten': {
-                        let checklist = [1, 2, 3, 4, 5];
-                        for(let i = 0; i < this.chosen_list.length; i++) {
-                            for(let x = 0; x < checklist.length; x++) {
-                                if(this.chosen_list[i] == checklist[x]) {
-                                    delete checklist[x];
-                                    checklist = checklist.filter(function (a) {
-                                        return a != null;
-                                    });
-                                }
-                            }
-                        }
-                        if(checklist.length != 0) return 0;
-                        else return 15;
-                    }
-
-                    case 'stor': {
-                        let checklist = [2, 3, 4, 5, 6];
-                        for(let i = 0; i < this.chosen_list.length; i++) {
-                            for(let x = 0; x < checklist.length; x++) {
-                                if(this.chosen_list[i] == checklist[x]) {
-                                    delete checklist[x];
-                                    checklist = checklist.filter(function (a) {
-                                        return a != null;
-                                    });
-                                }
-                            }
-                        }
-                        if(checklist.length != 0) return 0;
-                        else return 20;
-                    }
-
-                    case 'hus': {
-                        let counter = [0, 0, 0, 0, 0, 0];
-                        for(let x = 0; x < this.chosen_list.length; x++) {
-                            counter[this.chosen_list[x]-1]++;
-                        }
-                        if(counter.includes(2) && counter.includes(3)) {
-                            return (counter.indexOf(2)+1) * 2 + (counter.indexOf(3)+1) * 3
-                        } else {
-                            return 0;
-                        }
-                    }
-
-                    case 'sjanse': {
-                        return sum(this.chosen_list);
-                    }
-
-                    case 'yatzy': {
-                        return (sum(this.chosen_list) == 30) * 50;
-                    }
-                }
-            }
-        }
-    }
-
-    /* src\components\PlayerBar.svelte generated by Svelte v3.52.0 */
-
-    const file$4 = "src\\components\\PlayerBar.svelte";
-
-    // (16:8) {:else}
-    function create_else_block_1(ctx) {
-    	let img;
-    	let img_src_value;
-
-    	const block = {
-    		c: function create() {
-    			img = element("img");
-    			if (!src_url_equal(img.src, img_src_value = "media/profile1.png")) attr_dev(img, "src", img_src_value);
-    			attr_dev(img, "alt", "");
-    			attr_dev(img, "class", "svelte-1g84fbv");
-    			add_location(img, file$4, 16, 12, 315);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, img, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(img);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_else_block_1.name,
-    		type: "else",
-    		source: "(16:8) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (14:8) {#if bot}
-    function create_if_block_2(ctx) {
-    	let img;
-    	let img_src_value;
-
-    	const block = {
-    		c: function create() {
-    			img = element("img");
-    			if (!src_url_equal(img.src, img_src_value = "media/profile2.png")) attr_dev(img, "src", img_src_value);
-    			attr_dev(img, "alt", "");
-    			attr_dev(img, "class", "svelte-1g84fbv");
-    			add_location(img, file$4, 14, 12, 246);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, img, anchor);
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(img);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_2.name,
-    		type: "if",
-    		source: "(14:8) {#if bot}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (27:12) {:else}
-    function create_else_block$2(ctx) {
-    	let button;
-    	let mounted;
-    	let dispose;
-
-    	const block = {
-    		c: function create() {
-    			button = element("button");
-    			button.textContent = "KAST";
-    			attr_dev(button, "class", "not-cliackable svelte-1g84fbv");
-    			add_location(button, file$4, 27, 16, 697);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, button, anchor);
-
-    			if (!mounted) {
-    				dispose = listen_dev(button, "click", /*click_handler_1*/ ctx[5], false, false, false);
-    				mounted = true;
-    			}
-    		},
-    		p: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(button);
-    			mounted = false;
-    			dispose();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_else_block$2.name,
-    		type: "else",
-    		source: "(27:12) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (25:12) {#if engine.tries_left > 0}
-    function create_if_block_1$1(ctx) {
-    	let button;
-    	let mounted;
-    	let dispose;
-
-    	const block = {
-    		c: function create() {
-    			button = element("button");
-    			button.textContent = "KAST";
-    			attr_dev(button, "id", "button");
-    			attr_dev(button, "class", "svelte-1g84fbv");
-    			add_location(button, file$4, 25, 16, 599);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, button, anchor);
-
-    			if (!mounted) {
-    				dispose = listen_dev(button, "click", /*click_handler*/ ctx[4], false, false, false);
-    				mounted = true;
-    			}
-    		},
-    		p: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(button);
-    			mounted = false;
-    			dispose();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block_1$1.name,
-    		type: "if",
-    		source: "(25:12) {#if engine.tries_left > 0}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (24:8) {#if bot}
-    function create_if_block$2(ctx) {
-    	let button;
-
-    	const block = {
-    		c: function create() {
-    			button = element("button");
-    			attr_dev(button, "class", "svelte-1g84fbv");
-    			add_location(button, file$4, 23, 18, 523);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, button, anchor);
-    		},
-    		p: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(button);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block$2.name,
-    		type: "if",
-    		source: "(24:8) {#if bot}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function create_fragment$5(ctx) {
-    	let div3;
-    	let div0;
-    	let t0;
-    	let div1;
-    	let p;
-    	let t1;
-    	let t2;
-    	let div2;
-
-    	function select_block_type(ctx, dirty) {
-    		if (/*bot*/ ctx[1]) return create_if_block_2;
-    		return create_else_block_1;
-    	}
-
-    	let current_block_type = select_block_type(ctx);
-    	let if_block0 = current_block_type(ctx);
-
-    	function select_block_type_1(ctx, dirty) {
-    		if (/*bot*/ ctx[1]) return create_if_block$2;
-    		if (/*engine*/ ctx[2].tries_left > 0) return create_if_block_1$1;
-    		return create_else_block$2;
-    	}
-
-    	let current_block_type_1 = select_block_type_1(ctx);
-    	let if_block1 = current_block_type_1(ctx);
-
-    	const block = {
-    		c: function create() {
-    			div3 = element("div");
-    			div0 = element("div");
-    			if_block0.c();
-    			t0 = space();
-    			div1 = element("div");
-    			p = element("p");
-    			t1 = text(/*name*/ ctx[0]);
-    			t2 = space();
-    			div2 = element("div");
-    			if_block1.c();
-    			attr_dev(div0, "class", "profile-container svelte-1g84fbv");
-    			add_location(div0, file$4, 12, 4, 182);
-    			attr_dev(p, "id", "username");
-    			attr_dev(p, "class", "svelte-1g84fbv");
-    			add_location(p, file$4, 20, 8, 428);
-    			attr_dev(div1, "class", "username-container svelte-1g84fbv");
-    			add_location(div1, file$4, 19, 4, 386);
-    			attr_dev(div2, "class", "button-container svelte-1g84fbv");
-    			add_location(div2, file$4, 22, 4, 473);
-    			attr_dev(div3, "class", "container svelte-1g84fbv");
-    			add_location(div3, file$4, 11, 0, 153);
-    		},
-    		l: function claim(nodes) {
-    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div3, anchor);
-    			append_dev(div3, div0);
-    			if_block0.m(div0, null);
-    			append_dev(div3, t0);
-    			append_dev(div3, div1);
-    			append_dev(div1, p);
-    			append_dev(p, t1);
-    			append_dev(div3, t2);
-    			append_dev(div3, div2);
-    			if_block1.m(div2, null);
-    		},
-    		p: function update(ctx, [dirty]) {
-    			if (current_block_type !== (current_block_type = select_block_type(ctx))) {
-    				if_block0.d(1);
-    				if_block0 = current_block_type(ctx);
-
-    				if (if_block0) {
-    					if_block0.c();
-    					if_block0.m(div0, null);
-    				}
-    			}
-
-    			if (dirty & /*name*/ 1) set_data_dev(t1, /*name*/ ctx[0]);
-
-    			if (current_block_type_1 === (current_block_type_1 = select_block_type_1(ctx)) && if_block1) {
-    				if_block1.p(ctx, dirty);
-    			} else {
-    				if_block1.d(1);
-    				if_block1 = current_block_type_1(ctx);
-
-    				if (if_block1) {
-    					if_block1.c();
-    					if_block1.m(div2, null);
-    				}
-    			}
-    		},
-    		i: noop,
-    		o: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div3);
-    			if_block0.d();
-    			if_block1.d();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_fragment$5.name,
-    		type: "component",
-    		source: "",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function instance$5($$self, $$props, $$invalidate) {
-    	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots('PlayerBar', slots, []);
-    	let { name } = $$props;
-    	let { bot } = $$props;
-    	let { engine } = $$props;
-
-    	function roll() {
-    		engine.roll_dize();
-    	}
-
-    	$$self.$$.on_mount.push(function () {
-    		if (name === undefined && !('name' in $$props || $$self.$$.bound[$$self.$$.props['name']])) {
-    			console.warn("<PlayerBar> was created without expected prop 'name'");
-    		}
-
-    		if (bot === undefined && !('bot' in $$props || $$self.$$.bound[$$self.$$.props['bot']])) {
-    			console.warn("<PlayerBar> was created without expected prop 'bot'");
-    		}
-
-    		if (engine === undefined && !('engine' in $$props || $$self.$$.bound[$$self.$$.props['engine']])) {
-    			console.warn("<PlayerBar> was created without expected prop 'engine'");
-    		}
-    	});
-
-    	const writable_props = ['name', 'bot', 'engine'];
-
-    	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<PlayerBar> was created with unknown prop '${key}'`);
-    	});
-
-    	const click_handler = () => {
-    		roll();
-    	};
-
-    	const click_handler_1 = () => {
-    		roll();
-    	};
-
-    	$$self.$$set = $$props => {
-    		if ('name' in $$props) $$invalidate(0, name = $$props.name);
-    		if ('bot' in $$props) $$invalidate(1, bot = $$props.bot);
-    		if ('engine' in $$props) $$invalidate(2, engine = $$props.engine);
-    	};
-
-    	$$self.$capture_state = () => ({ name, bot, engine, roll });
-
-    	$$self.$inject_state = $$props => {
-    		if ('name' in $$props) $$invalidate(0, name = $$props.name);
-    		if ('bot' in $$props) $$invalidate(1, bot = $$props.bot);
-    		if ('engine' in $$props) $$invalidate(2, engine = $$props.engine);
-    	};
-
-    	if ($$props && "$$inject" in $$props) {
-    		$$self.$inject_state($$props.$$inject);
-    	}
-
-    	return [name, bot, engine, roll, click_handler, click_handler_1];
-    }
-
-    class PlayerBar extends SvelteComponentDev {
-    	constructor(options) {
-    		super(options);
-    		init(this, options, instance$5, create_fragment$5, safe_not_equal, { name: 0, bot: 1, engine: 2 });
-
-    		dispatch_dev("SvelteRegisterComponent", {
-    			component: this,
-    			tagName: "PlayerBar",
-    			options,
-    			id: create_fragment$5.name
-    		});
-    	}
-
-    	get name() {
-    		throw new Error("<PlayerBar>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set name(value) {
-    		throw new Error("<PlayerBar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get bot() {
-    		throw new Error("<PlayerBar>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set bot(value) {
-    		throw new Error("<PlayerBar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	get engine() {
-    		throw new Error("<PlayerBar>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set engine(value) {
-    		throw new Error("<PlayerBar>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-    }
-
-    /* src\components\Board.svelte generated by Svelte v3.52.0 */
-
-    const file$3 = "src\\components\\Board.svelte";
-
-    function get_each_context$1(ctx, list, i) {
-    	const child_ctx = ctx.slice();
-    	child_ctx[3] = list[i];
-    	return child_ctx;
-    }
-
-    function get_each_context_1(ctx, list, i) {
-    	const child_ctx = ctx.slice();
-    	child_ctx[6] = list[i];
-    	return child_ctx;
-    }
-
-    function get_each_context_2(ctx, list, i) {
-    	const child_ctx = ctx.slice();
-    	child_ctx[3] = list[i];
-    	return child_ctx;
-    }
-
-    // (10:8) {#each engine.dizes as dice}
-    function create_each_block_2(ctx) {
-    	let img;
-    	let img_id_value;
-    	let img_src_value;
-
-    	const block = {
-    		c: function create() {
-    			img = element("img");
-    			attr_dev(img, "class", "dice svelte-phmzjm");
-    			attr_dev(img, "id", img_id_value = /*dice*/ ctx[3]);
-    			if (!src_url_equal(img.src, img_src_value = "media/" + /*dice*/ ctx[3] + ".png")) attr_dev(img, "src", img_src_value);
-    			attr_dev(img, "alt", "");
-    			add_location(img, file$3, 10, 12, 162);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, img, anchor);
-    		},
-    		p: function update(ctx, dirty) {
-    			if (dirty & /*engine*/ 1 && img_id_value !== (img_id_value = /*dice*/ ctx[3])) {
-    				attr_dev(img, "id", img_id_value);
-    			}
-
-    			if (dirty & /*engine*/ 1 && !src_url_equal(img.src, img_src_value = "media/" + /*dice*/ ctx[3] + ".png")) {
-    				attr_dev(img, "src", img_src_value);
-    			}
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(img);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_each_block_2.name,
-    		type: "each",
-    		source: "(10:8) {#each engine.dizes as dice}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (15:8) {#each engine.chosen_list as chosen}
-    function create_each_block_1(ctx) {
-    	let img;
-    	let img_id_value;
-    	let img_src_value;
-    	let mounted;
-    	let dispose;
-
-    	function click_handler() {
-    		return /*click_handler*/ ctx[1](/*chosen*/ ctx[6]);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			img = element("img");
-    			attr_dev(img, "class", "dice svelte-phmzjm");
-    			attr_dev(img, "id", img_id_value = /*chosen*/ ctx[6]);
-    			if (!src_url_equal(img.src, img_src_value = "media/" + /*chosen*/ ctx[6] + ".png")) attr_dev(img, "src", img_src_value);
-    			attr_dev(img, "alt", "");
-    			add_location(img, file$3, 15, 12, 344);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, img, anchor);
-
-    			if (!mounted) {
-    				dispose = listen_dev(img, "click", click_handler, false, false, false);
-    				mounted = true;
-    			}
-    		},
-    		p: function update(new_ctx, dirty) {
-    			ctx = new_ctx;
-
-    			if (dirty & /*engine*/ 1 && img_id_value !== (img_id_value = /*chosen*/ ctx[6])) {
-    				attr_dev(img, "id", img_id_value);
-    			}
-
-    			if (dirty & /*engine*/ 1 && !src_url_equal(img.src, img_src_value = "media/" + /*chosen*/ ctx[6] + ".png")) {
-    				attr_dev(img, "src", img_src_value);
-    			}
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(img);
-    			mounted = false;
-    			dispose();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_each_block_1.name,
-    		type: "each",
-    		source: "(15:8) {#each engine.chosen_list as chosen}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (20:8) {#each engine.dizes as dice}
-    function create_each_block$1(ctx) {
-    	let img;
-    	let img_id_value;
-    	let img_src_value;
-    	let mounted;
-    	let dispose;
-
-    	function click_handler_1() {
-    		return /*click_handler_1*/ ctx[2](/*dice*/ ctx[3]);
-    	}
-
-    	const block = {
-    		c: function create() {
-    			img = element("img");
-    			attr_dev(img, "class", "dice svelte-phmzjm");
-    			attr_dev(img, "id", img_id_value = /*dice*/ ctx[3]);
-    			if (!src_url_equal(img.src, img_src_value = "media/" + /*dice*/ ctx[3] + ".png")) attr_dev(img, "src", img_src_value);
-    			attr_dev(img, "alt", "");
-    			add_location(img, file$3, 20, 12, 584);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, img, anchor);
-
-    			if (!mounted) {
-    				dispose = listen_dev(img, "click", click_handler_1, false, false, false);
-    				mounted = true;
-    			}
-    		},
-    		p: function update(new_ctx, dirty) {
-    			ctx = new_ctx;
-
-    			if (dirty & /*engine*/ 1 && img_id_value !== (img_id_value = /*dice*/ ctx[3])) {
-    				attr_dev(img, "id", img_id_value);
-    			}
-
-    			if (dirty & /*engine*/ 1 && !src_url_equal(img.src, img_src_value = "media/" + /*dice*/ ctx[3] + ".png")) {
-    				attr_dev(img, "src", img_src_value);
-    			}
-    		},
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(img);
-    			mounted = false;
-    			dispose();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_each_block$1.name,
-    		type: "each",
-    		source: "(20:8) {#each engine.dizes as dice}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function create_fragment$4(ctx) {
-    	let div3;
-    	let div0;
-    	let t0;
-    	let div1;
-    	let t1;
-    	let div2;
-    	let each_value_2 = /*engine*/ ctx[0].dizes;
-    	validate_each_argument(each_value_2);
-    	let each_blocks_2 = [];
-
-    	for (let i = 0; i < each_value_2.length; i += 1) {
-    		each_blocks_2[i] = create_each_block_2(get_each_context_2(ctx, each_value_2, i));
-    	}
-
-    	let each_value_1 = /*engine*/ ctx[0].chosen_list;
-    	validate_each_argument(each_value_1);
-    	let each_blocks_1 = [];
-
-    	for (let i = 0; i < each_value_1.length; i += 1) {
-    		each_blocks_1[i] = create_each_block_1(get_each_context_1(ctx, each_value_1, i));
-    	}
-
-    	let each_value = /*engine*/ ctx[0].dizes;
-    	validate_each_argument(each_value);
-    	let each_blocks = [];
-
-    	for (let i = 0; i < each_value.length; i += 1) {
-    		each_blocks[i] = create_each_block$1(get_each_context$1(ctx, each_value, i));
-    	}
-
-    	const block = {
-    		c: function create() {
-    			div3 = element("div");
-    			div0 = element("div");
-
-    			for (let i = 0; i < each_blocks_2.length; i += 1) {
-    				each_blocks_2[i].c();
-    			}
-
-    			t0 = space();
-    			div1 = element("div");
-
-    			for (let i = 0; i < each_blocks_1.length; i += 1) {
-    				each_blocks_1[i].c();
-    			}
-
-    			t1 = space();
-    			div2 = element("div");
-
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				each_blocks[i].c();
-    			}
-
-    			attr_dev(div0, "class", "dizeholder hidden svelte-phmzjm");
-    			add_location(div0, file$3, 8, 4, 79);
-    			attr_dev(div1, "class", "dizeholder svelte-phmzjm");
-    			add_location(div1, file$3, 13, 4, 260);
-    			attr_dev(div2, "class", "dizeholder svelte-phmzjm");
-    			add_location(div2, file$3, 18, 4, 508);
-    			attr_dev(div3, "id", "container");
-    			attr_dev(div3, "class", "svelte-phmzjm");
-    			add_location(div3, file$3, 7, 0, 53);
-    		},
-    		l: function claim(nodes) {
-    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div3, anchor);
-    			append_dev(div3, div0);
-
-    			for (let i = 0; i < each_blocks_2.length; i += 1) {
-    				each_blocks_2[i].m(div0, null);
-    			}
-
-    			append_dev(div3, t0);
-    			append_dev(div3, div1);
-
-    			for (let i = 0; i < each_blocks_1.length; i += 1) {
-    				each_blocks_1[i].m(div1, null);
-    			}
-
-    			append_dev(div3, t1);
-    			append_dev(div3, div2);
-
-    			for (let i = 0; i < each_blocks.length; i += 1) {
-    				each_blocks[i].m(div2, null);
-    			}
-    		},
-    		p: function update(ctx, [dirty]) {
-    			if (dirty & /*engine*/ 1) {
-    				each_value_2 = /*engine*/ ctx[0].dizes;
-    				validate_each_argument(each_value_2);
-    				let i;
-
-    				for (i = 0; i < each_value_2.length; i += 1) {
-    					const child_ctx = get_each_context_2(ctx, each_value_2, i);
-
-    					if (each_blocks_2[i]) {
-    						each_blocks_2[i].p(child_ctx, dirty);
-    					} else {
-    						each_blocks_2[i] = create_each_block_2(child_ctx);
-    						each_blocks_2[i].c();
-    						each_blocks_2[i].m(div0, null);
-    					}
-    				}
-
-    				for (; i < each_blocks_2.length; i += 1) {
-    					each_blocks_2[i].d(1);
-    				}
-
-    				each_blocks_2.length = each_value_2.length;
-    			}
-
-    			if (dirty & /*engine*/ 1) {
-    				each_value_1 = /*engine*/ ctx[0].chosen_list;
-    				validate_each_argument(each_value_1);
-    				let i;
-
-    				for (i = 0; i < each_value_1.length; i += 1) {
-    					const child_ctx = get_each_context_1(ctx, each_value_1, i);
-
-    					if (each_blocks_1[i]) {
-    						each_blocks_1[i].p(child_ctx, dirty);
-    					} else {
-    						each_blocks_1[i] = create_each_block_1(child_ctx);
-    						each_blocks_1[i].c();
-    						each_blocks_1[i].m(div1, null);
-    					}
-    				}
-
-    				for (; i < each_blocks_1.length; i += 1) {
-    					each_blocks_1[i].d(1);
-    				}
-
-    				each_blocks_1.length = each_value_1.length;
-    			}
-
-    			if (dirty & /*engine*/ 1) {
-    				each_value = /*engine*/ ctx[0].dizes;
-    				validate_each_argument(each_value);
-    				let i;
-
-    				for (i = 0; i < each_value.length; i += 1) {
-    					const child_ctx = get_each_context$1(ctx, each_value, i);
-
-    					if (each_blocks[i]) {
-    						each_blocks[i].p(child_ctx, dirty);
-    					} else {
-    						each_blocks[i] = create_each_block$1(child_ctx);
-    						each_blocks[i].c();
-    						each_blocks[i].m(div2, null);
-    					}
-    				}
-
-    				for (; i < each_blocks.length; i += 1) {
-    					each_blocks[i].d(1);
-    				}
-
-    				each_blocks.length = each_value.length;
-    			}
-    		},
-    		i: noop,
-    		o: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div3);
-    			destroy_each(each_blocks_2, detaching);
-    			destroy_each(each_blocks_1, detaching);
-    			destroy_each(each_blocks, detaching);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_fragment$4.name,
-    		type: "component",
-    		source: "",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function instance$4($$self, $$props, $$invalidate) {
-    	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots('Board', slots, []);
-    	let { engine } = $$props;
-
-    	$$self.$$.on_mount.push(function () {
-    		if (engine === undefined && !('engine' in $$props || $$self.$$.bound[$$self.$$.props['engine']])) {
-    			console.warn("<Board> was created without expected prop 'engine'");
-    		}
-    	});
-
-    	const writable_props = ['engine'];
-
-    	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Board> was created with unknown prop '${key}'`);
-    	});
-
-    	const click_handler = chosen => {
-    		engine.remove_chosen(chosen);
-    		$$invalidate(0, engine);
-    	};
-
-    	const click_handler_1 = dice => {
-    		engine.new_chosen(dice);
-    		$$invalidate(0, engine);
-    	};
-
-    	$$self.$$set = $$props => {
-    		if ('engine' in $$props) $$invalidate(0, engine = $$props.engine);
-    	};
-
-    	$$self.$capture_state = () => ({ engine });
-
-    	$$self.$inject_state = $$props => {
-    		if ('engine' in $$props) $$invalidate(0, engine = $$props.engine);
-    	};
-
-    	if ($$props && "$$inject" in $$props) {
-    		$$self.$inject_state($$props.$$inject);
-    	}
-
-    	return [engine, click_handler, click_handler_1];
-    }
-
-    class Board extends SvelteComponentDev {
-    	constructor(options) {
-    		super(options);
-    		init(this, options, instance$4, create_fragment$4, safe_not_equal, { engine: 0 });
-
-    		dispatch_dev("SvelteRegisterComponent", {
-    			component: this,
-    			tagName: "Board",
-    			options,
-    			id: create_fragment$4.name
-    		});
-    	}
-
-    	get engine() {
-    		throw new Error("<Board>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set engine(value) {
-    		throw new Error("<Board>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-    }
-
-    /* src\components\Overlay.svelte generated by Svelte v3.52.0 */
-
-    const file$2 = "src\\components\\Overlay.svelte";
-
-    // (16:8) {:else}
-    function create_else_block$1(ctx) {
-    	let h1;
-
-    	const block = {
-    		c: function create() {
-    			h1 = element("h1");
-    			h1.textContent = "Prøv igjen!";
-    			attr_dev(h1, "id", "title");
-    			attr_dev(h1, "class", "svelte-1mx1493");
-    			add_location(h1, file$2, 16, 12, 354);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, h1, anchor);
-    		},
-    		p: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(h1);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_else_block$1.name,
-    		type: "else",
-    		source: "(16:8) {:else}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    // (14:8) {#if vinner()}
-    function create_if_block$1(ctx) {
-    	let h1;
-
-    	const block = {
-    		c: function create() {
-    			h1 = element("h1");
-    			h1.textContent = `Du vant ${sessionStorage.getItem("username")}!`;
-    			attr_dev(h1, "id", "title");
-    			attr_dev(h1, "class", "svelte-1mx1493");
-    			add_location(h1, file$2, 14, 12, 258);
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, h1, anchor);
-    		},
-    		p: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(h1);
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_if_block$1.name,
-    		type: "if",
-    		source: "(14:8) {#if vinner()}",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function create_fragment$3(ctx) {
-    	let div2;
-    	let div1;
-    	let t0;
-    	let img;
-    	let img_src_value;
-    	let t1;
-    	let div0;
-    	let p0;
-    	let t2;
-    	let t3_value = /*engine*/ ctx[0].points + "";
-    	let t3;
-    	let t4;
-    	let p1;
-
-    	function select_block_type(ctx, dirty) {
-    		if (/*vinner*/ ctx[1]()) return create_if_block$1;
-    		return create_else_block$1;
-    	}
-
-    	let current_block_type = select_block_type(ctx);
-    	let if_block = current_block_type(ctx);
-
-    	const block = {
-    		c: function create() {
-    			div2 = element("div");
-    			div1 = element("div");
-    			if_block.c();
-    			t0 = space();
-    			img = element("img");
-    			t1 = space();
-    			div0 = element("div");
-    			p0 = element("p");
-    			t2 = text("Poeng: ");
-    			t3 = text(t3_value);
-    			t4 = space();
-    			p1 = element("p");
-    			p1.textContent = `Beste: ${localStorage.getItem("beste")}`;
-    			if (!src_url_equal(img.src, img_src_value = "media/image2.png")) attr_dev(img, "src", img_src_value);
-    			attr_dev(img, "alt", "");
-    			attr_dev(img, "id", "logo");
-    			attr_dev(img, "class", "svelte-1mx1493");
-    			add_location(img, file$2, 18, 8, 410);
-    			attr_dev(p0, "id", "points");
-    			add_location(p0, file$2, 20, 12, 500);
-    			add_location(p1, file$2, 21, 12, 555);
-    			attr_dev(div0, "class", "bottom svelte-1mx1493");
-    			add_location(div0, file$2, 19, 8, 466);
-    			attr_dev(div1, "class", "card svelte-1mx1493");
-    			add_location(div1, file$2, 12, 4, 202);
-    			attr_dev(div2, "class", "container svelte-1mx1493");
-    			add_location(div2, file$2, 11, 0, 173);
-    		},
-    		l: function claim(nodes) {
-    			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
-    		},
-    		m: function mount(target, anchor) {
-    			insert_dev(target, div2, anchor);
-    			append_dev(div2, div1);
-    			if_block.m(div1, null);
-    			append_dev(div1, t0);
-    			append_dev(div1, img);
-    			append_dev(div1, t1);
-    			append_dev(div1, div0);
-    			append_dev(div0, p0);
-    			append_dev(p0, t2);
-    			append_dev(p0, t3);
-    			append_dev(div0, t4);
-    			append_dev(div0, p1);
-    		},
-    		p: function update(ctx, [dirty]) {
-    			if_block.p(ctx, dirty);
-    			if (dirty & /*engine*/ 1 && t3_value !== (t3_value = /*engine*/ ctx[0].points + "")) set_data_dev(t3, t3_value);
-    		},
-    		i: noop,
-    		o: noop,
-    		d: function destroy(detaching) {
-    			if (detaching) detach_dev(div2);
-    			if_block.d();
-    		}
-    	};
-
-    	dispatch_dev("SvelteRegisterBlock", {
-    		block,
-    		id: create_fragment$3.name,
-    		type: "component",
-    		source: "",
-    		ctx
-    	});
-
-    	return block;
-    }
-
-    function instance$3($$self, $$props, $$invalidate) {
-    	let { $$slots: slots = {}, $$scope } = $$props;
-    	validate_slots('Overlay', slots, []);
-    	let { engine } = $$props;
-
-    	function vinner() {
-    		if (engine.points > engine.bot_points) return true; else return false;
-    	}
-
-    	$$self.$$.on_mount.push(function () {
-    		if (engine === undefined && !('engine' in $$props || $$self.$$.bound[$$self.$$.props['engine']])) {
-    			console.warn("<Overlay> was created without expected prop 'engine'");
-    		}
-    	});
-
-    	const writable_props = ['engine'];
-
-    	Object.keys($$props).forEach(key => {
-    		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Overlay> was created with unknown prop '${key}'`);
-    	});
-
-    	$$self.$$set = $$props => {
-    		if ('engine' in $$props) $$invalidate(0, engine = $$props.engine);
-    	};
-
-    	$$self.$capture_state = () => ({ engine, vinner });
-
-    	$$self.$inject_state = $$props => {
-    		if ('engine' in $$props) $$invalidate(0, engine = $$props.engine);
-    	};
-
-    	if ($$props && "$$inject" in $$props) {
-    		$$self.$inject_state($$props.$$inject);
-    	}
-
-    	return [engine, vinner];
-    }
-
-    class Overlay extends SvelteComponentDev {
-    	constructor(options) {
-    		super(options);
-    		init(this, options, instance$3, create_fragment$3, safe_not_equal, { engine: 0 });
-
-    		dispatch_dev("SvelteRegisterComponent", {
-    			component: this,
-    			tagName: "Overlay",
-    			options,
-    			id: create_fragment$3.name
-    		});
-    	}
-
-    	get engine() {
-    		throw new Error("<Overlay>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-
-    	set engine(value) {
-    		throw new Error("<Overlay>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
-    	}
-    }
 
     /* src\Home.svelte generated by Svelte v3.52.0 */
     const file$1 = "src\\Home.svelte";
 
     function get_each_context(ctx, list, i) {
     	const child_ctx = ctx.slice();
-    	child_ctx[7] = list[i];
+    	child_ctx[8] = list[i];
     	return child_ctx;
     }
 
-    // (54:0) {#if engine.done}
-    function create_if_block_1(ctx) {
+    // (65:0) {#if engine.done}
+    function create_if_block_2(ctx) {
     	let overlay;
     	let current;
 
@@ -19774,34 +16278,34 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block_1.name,
+    		id: create_if_block_2.name,
     		type: "if",
-    		source: "(54:0) {#if engine.done}",
+    		source: "(65:0) {#if engine.done}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (75:24) {:else}
-    function create_else_block(ctx) {
+    // (92:24) {:else}
+    function create_else_block_1(ctx) {
     	let td;
-    	let t_value = /*nice*/ ctx[7].v1 + "";
+    	let t_value = /*nice*/ ctx[8].v1 + "";
     	let t;
 
     	const block = {
     		c: function create() {
     			td = element("td");
     			t = text(t_value);
-    			attr_dev(td, "class", "not-clickable svelte-19214nv");
-    			add_location(td, file$1, 75, 28, 3085);
+    			attr_dev(td, "class", "not-clickable svelte-6mxglo");
+    			add_location(td, file$1, 92, 28, 3645);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, td, anchor);
     			append_dev(td, t);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*board*/ 2 && t_value !== (t_value = /*nice*/ ctx[7].v1 + "")) set_data_dev(t, t_value);
+    			if (dirty & /*board*/ 2 && t_value !== (t_value = /*nice*/ ctx[8].v1 + "")) set_data_dev(t, t_value);
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(td);
@@ -19810,29 +16314,136 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_else_block.name,
+    		id: create_else_block_1.name,
     		type: "else",
-    		source: "(75:24) {:else}",
+    		source: "(92:24) {:else}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (73:24) {#if nice.pot && nice.v1 == 0}
+    // (86:24) {#if nice.v1 == 0}
     function create_if_block(ctx) {
+    	let if_block_anchor;
+
+    	function select_block_type_1(ctx, dirty) {
+    		if (/*nice*/ ctx[8].pot) return create_if_block_1;
+    		return create_else_block;
+    	}
+
+    	let current_block_type = select_block_type_1(ctx);
+    	let if_block = current_block_type(ctx);
+
+    	const block = {
+    		c: function create() {
+    			if_block.c();
+    			if_block_anchor = empty();
+    		},
+    		m: function mount(target, anchor) {
+    			if_block.m(target, anchor);
+    			insert_dev(target, if_block_anchor, anchor);
+    		},
+    		p: function update(ctx, dirty) {
+    			if (current_block_type === (current_block_type = select_block_type_1(ctx)) && if_block) {
+    				if_block.p(ctx, dirty);
+    			} else {
+    				if_block.d(1);
+    				if_block = current_block_type(ctx);
+
+    				if (if_block) {
+    					if_block.c();
+    					if_block.m(if_block_anchor.parentNode, if_block_anchor);
+    				}
+    			}
+    		},
+    		d: function destroy(detaching) {
+    			if_block.d(detaching);
+    			if (detaching) detach_dev(if_block_anchor);
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_if_block.name,
+    		type: "if",
+    		source: "(86:24) {#if nice.v1 == 0}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (89:28) {:else}
+    function create_else_block(ctx) {
     	let td;
-    	let t0_value = /*nice*/ ctx[7].v1 + "";
+    	let t_value = /*nice*/ ctx[8].v1 + "";
+    	let t;
+    	let td_id_value;
+    	let mounted;
+    	let dispose;
+
+    	function click_handler_1() {
+    		return /*click_handler_1*/ ctx[6](/*nice*/ ctx[8]);
+    	}
+
+    	const block = {
+    		c: function create() {
+    			td = element("td");
+    			t = text(t_value);
+    			attr_dev(td, "class", "clickable svelte-6mxglo");
+    			attr_dev(td, "id", td_id_value = /*nice*/ ctx[8].title);
+    			add_location(td, file$1, 89, 32, 3446);
+    		},
+    		m: function mount(target, anchor) {
+    			insert_dev(target, td, anchor);
+    			append_dev(td, t);
+
+    			if (!mounted) {
+    				dispose = listen_dev(td, "click", click_handler_1, false, false, false);
+    				mounted = true;
+    			}
+    		},
+    		p: function update(new_ctx, dirty) {
+    			ctx = new_ctx;
+    			if (dirty & /*board*/ 2 && t_value !== (t_value = /*nice*/ ctx[8].v1 + "")) set_data_dev(t, t_value);
+
+    			if (dirty & /*board*/ 2 && td_id_value !== (td_id_value = /*nice*/ ctx[8].title)) {
+    				attr_dev(td, "id", td_id_value);
+    			}
+    		},
+    		d: function destroy(detaching) {
+    			if (detaching) detach_dev(td);
+    			mounted = false;
+    			dispose();
+    		}
+    	};
+
+    	dispatch_dev("SvelteRegisterBlock", {
+    		block,
+    		id: create_else_block.name,
+    		type: "else",
+    		source: "(89:28) {:else}",
+    		ctx
+    	});
+
+    	return block;
+    }
+
+    // (87:28) {#if nice.pot}
+    function create_if_block_1(ctx) {
+    	let td;
+    	let t0_value = /*nice*/ ctx[8].v1 + "";
     	let t0;
     	let t1;
-    	let t2_value = /*nice*/ ctx[7].pot + "";
+    	let t2_value = /*nice*/ ctx[8].pot + "";
     	let t2;
     	let td_id_value;
     	let mounted;
     	let dispose;
 
     	function click_handler() {
-    		return /*click_handler*/ ctx[5](/*nice*/ ctx[7]);
+    		return /*click_handler*/ ctx[5](/*nice*/ ctx[8]);
     	}
 
     	const block = {
@@ -19841,9 +16452,9 @@ var app = (function () {
     			t0 = text(t0_value);
     			t1 = text(" + ");
     			t2 = text(t2_value);
-    			attr_dev(td, "class", "clickable svelte-19214nv");
-    			attr_dev(td, "id", td_id_value = /*nice*/ ctx[7].title);
-    			add_location(td, file$1, 73, 28, 2908);
+    			attr_dev(td, "class", "clickable svelte-6mxglo");
+    			attr_dev(td, "id", td_id_value = /*nice*/ ctx[8].title);
+    			add_location(td, file$1, 87, 32, 3261);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, td, anchor);
@@ -19858,10 +16469,10 @@ var app = (function () {
     		},
     		p: function update(new_ctx, dirty) {
     			ctx = new_ctx;
-    			if (dirty & /*board*/ 2 && t0_value !== (t0_value = /*nice*/ ctx[7].v1 + "")) set_data_dev(t0, t0_value);
-    			if (dirty & /*board*/ 2 && t2_value !== (t2_value = /*nice*/ ctx[7].pot + "")) set_data_dev(t2, t2_value);
+    			if (dirty & /*board*/ 2 && t0_value !== (t0_value = /*nice*/ ctx[8].v1 + "")) set_data_dev(t0, t0_value);
+    			if (dirty & /*board*/ 2 && t2_value !== (t2_value = /*nice*/ ctx[8].pot + "")) set_data_dev(t2, t2_value);
 
-    			if (dirty & /*board*/ 2 && td_id_value !== (td_id_value = /*nice*/ ctx[7].title)) {
+    			if (dirty & /*board*/ 2 && td_id_value !== (td_id_value = /*nice*/ ctx[8].title)) {
     				attr_dev(td, "id", td_id_value);
     			}
     		},
@@ -19874,31 +16485,31 @@ var app = (function () {
 
     	dispatch_dev("SvelteRegisterBlock", {
     		block,
-    		id: create_if_block.name,
+    		id: create_if_block_1.name,
     		type: "if",
-    		source: "(73:24) {#if nice.pot && nice.v1 == 0}",
+    		source: "(87:28) {#if nice.pot}",
     		ctx
     	});
 
     	return block;
     }
 
-    // (70:16) {#each board as nice}
+    // (83:16) {#each board as nice}
     function create_each_block(ctx) {
     	let tr;
     	let td0;
-    	let t0_value = /*nice*/ ctx[7].title + "";
+    	let t0_value = /*nice*/ ctx[8].title + "";
     	let t0;
     	let t1;
     	let t2;
     	let td1;
-    	let t3_value = /*nice*/ ctx[7].v2 + "";
+    	let t3_value = /*nice*/ ctx[8].v2 + "";
     	let t3;
     	let t4;
 
     	function select_block_type(ctx, dirty) {
-    		if (/*nice*/ ctx[7].pot && /*nice*/ ctx[7].v1 == 0) return create_if_block;
-    		return create_else_block;
+    		if (/*nice*/ ctx[8].v1 == 0) return create_if_block;
+    		return create_else_block_1;
     	}
 
     	let current_block_type = select_block_type(ctx);
@@ -19915,11 +16526,11 @@ var app = (function () {
     			td1 = element("td");
     			t3 = text(t3_value);
     			t4 = space();
-    			attr_dev(td0, "class", "svelte-19214nv");
-    			add_location(td0, file$1, 71, 24, 2801);
-    			attr_dev(td1, "class", "svelte-19214nv");
-    			add_location(td1, file$1, 77, 24, 3182);
-    			add_location(tr, file$1, 70, 20, 2771);
+    			attr_dev(td0, "class", "svelte-6mxglo");
+    			add_location(td0, file$1, 84, 24, 3118);
+    			attr_dev(td1, "class", "svelte-6mxglo");
+    			add_location(td1, file$1, 94, 24, 3742);
+    			add_location(tr, file$1, 83, 20, 3088);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, tr, anchor);
@@ -19933,7 +16544,7 @@ var app = (function () {
     			append_dev(tr, t4);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*board*/ 2 && t0_value !== (t0_value = /*nice*/ ctx[7].title + "")) set_data_dev(t0, t0_value);
+    			if (dirty & /*board*/ 2 && t0_value !== (t0_value = /*nice*/ ctx[8].title + "")) set_data_dev(t0, t0_value);
 
     			if (current_block_type === (current_block_type = select_block_type(ctx)) && if_block) {
     				if_block.p(ctx, dirty);
@@ -19947,7 +16558,7 @@ var app = (function () {
     				}
     			}
 
-    			if (dirty & /*board*/ 2 && t3_value !== (t3_value = /*nice*/ ctx[7].v2 + "")) set_data_dev(t3, t3_value);
+    			if (dirty & /*board*/ 2 && t3_value !== (t3_value = /*nice*/ ctx[8].v2 + "")) set_data_dev(t3, t3_value);
     		},
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(tr);
@@ -19959,7 +16570,7 @@ var app = (function () {
     		block,
     		id: create_each_block.name,
     		type: "each",
-    		source: "(70:16) {#each board as nice}",
+    		source: "(83:16) {#each board as nice}",
     		ctx
     	});
 
@@ -19991,7 +16602,7 @@ var app = (function () {
     	let current;
     	let mounted;
     	let dispose;
-    	let if_block = /*engine*/ ctx[0].done && create_if_block_1(ctx);
+    	let if_block = /*engine*/ ctx[0].done && create_if_block_2(ctx);
 
     	playerbar0 = new PlayerBar({
     			props: {
@@ -20055,25 +16666,25 @@ var app = (function () {
     			t9 = space();
     			button = element("button");
     			button.textContent = "FERDIG";
-    			attr_dev(div0, "class", "left svelte-19214nv");
-    			add_location(div0, file$1, 56, 4, 2321);
-    			attr_dev(th0, "class", "svelte-19214nv");
-    			add_location(th0, file$1, 65, 20, 2602);
-    			attr_dev(th1, "class", "svelte-19214nv");
-    			add_location(th1, file$1, 66, 20, 2634);
-    			attr_dev(th2, "class", "svelte-19214nv");
-    			add_location(th2, file$1, 67, 20, 2675);
-    			add_location(tr, file$1, 64, 16, 2576);
-    			add_location(table, file$1, 63, 12, 2551);
-    			attr_dev(div1, "class", "board svelte-19214nv");
-    			add_location(div1, file$1, 62, 8, 2518);
+    			attr_dev(div0, "class", "left svelte-6mxglo");
+    			add_location(div0, file$1, 69, 4, 2638);
+    			attr_dev(th0, "class", "svelte-6mxglo");
+    			add_location(th0, file$1, 78, 20, 2919);
+    			attr_dev(th1, "class", "svelte-6mxglo");
+    			add_location(th1, file$1, 79, 20, 2951);
+    			attr_dev(th2, "class", "svelte-6mxglo");
+    			add_location(th2, file$1, 80, 20, 2992);
+    			add_location(tr, file$1, 77, 16, 2893);
+    			add_location(table, file$1, 76, 12, 2868);
+    			attr_dev(div1, "class", "board svelte-6mxglo");
+    			add_location(div1, file$1, 75, 8, 2835);
     			attr_dev(button, "id", "done-button");
-    			attr_dev(button, "class", "svelte-19214nv");
-    			add_location(button, file$1, 82, 8, 3300);
-    			attr_dev(div2, "class", "right svelte-19214nv");
-    			add_location(div2, file$1, 61, 4, 2489);
-    			attr_dev(div3, "class", "container svelte-19214nv");
-    			add_location(div3, file$1, 55, 0, 2292);
+    			attr_dev(button, "class", "svelte-6mxglo");
+    			add_location(button, file$1, 99, 8, 3860);
+    			attr_dev(div2, "class", "right svelte-6mxglo");
+    			add_location(div2, file$1, 74, 4, 2806);
+    			attr_dev(div3, "class", "container svelte-6mxglo");
+    			add_location(div3, file$1, 68, 0, 2609);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -20109,7 +16720,7 @@ var app = (function () {
     			current = true;
 
     			if (!mounted) {
-    				dispose = listen_dev(button, "click", /*click_handler_1*/ ctx[6], false, false, false);
+    				dispose = listen_dev(button, "click", /*click_handler_2*/ ctx[7], false, false, false);
     				mounted = true;
     			}
     		},
@@ -20122,7 +16733,7 @@ var app = (function () {
     						transition_in(if_block, 1);
     					}
     				} else {
-    					if_block = create_if_block_1(ctx);
+    					if_block = create_if_block_2(ctx);
     					if_block.c();
     					transition_in(if_block, 1);
     					if_block.m(t0.parentNode, t0);
@@ -20217,7 +16828,7 @@ var app = (function () {
     	validate_slots('Home', slots, []);
     	var username = sessionStorage.getItem("username");
 
-    	// Skulle gjerne funnet en løsning på dette
+    	// Skulle gjerne funnet en bedre løsning på dette
     	setInterval(
     		() => {
     			$$invalidate(0, engine);
@@ -20230,10 +16841,18 @@ var app = (function () {
     	}
 
     	function clicked(title, pot) {
-    		for (let i = 0; i < board.length; i++) {
-    			if (board[i].title == title) {
-    				$$invalidate(0, engine.points_detail[i] += pot, engine);
-    				$$invalidate(0, engine.points += pot, engine);
+    		if (pot == 0) {
+    			for (let i = 0; i < board.length; i++) {
+    				if (board[i].title == title) {
+    					$$invalidate(0, engine.points_detail[i] = '-', engine);
+    				}
+    			}
+    		} else {
+    			for (let i = 0; i < board.length; i++) {
+    				if (board[i].title == title) {
+    					$$invalidate(0, engine.points_detail[i] += pot, engine);
+    					$$invalidate(0, engine.points += pot, engine);
+    				}
     			}
     		}
 
@@ -20241,6 +16860,7 @@ var app = (function () {
     	}
 
     	function ferdig() {
+    		localStorage.setItem("beste", engine.points);
     		$$invalidate(0, engine.done = true, engine);
     	}
 
@@ -20254,7 +16874,11 @@ var app = (function () {
     		clicked(nice.title, nice.pot);
     	};
 
-    	const click_handler_1 = () => {
+    	const click_handler_1 = nice => {
+    		clicked(nice.title, nice.pot);
+    	};
+
+    	const click_handler_2 = () => {
     		ferdig();
     	};
 
@@ -20263,8 +16887,7 @@ var app = (function () {
     		PlayerBar,
     		Board,
     		Overlay,
-    		bitOrDependencies,
-    		sum,
+    		not,
     		username,
     		clicked,
     		ferdig,
@@ -20362,7 +16985,17 @@ var app = (function () {
     	};
 
     	$$invalidate(0, engine = new Engine(5));
-    	return [engine, board, username, clicked, ferdig, click_handler, click_handler_1];
+
+    	return [
+    		engine,
+    		board,
+    		username,
+    		clicked,
+    		ferdig,
+    		click_handler,
+    		click_handler_1,
+    		click_handler_2
+    	];
     }
 
     class Home extends SvelteComponentDev {
@@ -20412,25 +17045,25 @@ var app = (function () {
     			attr_dev(input, "type", "text");
     			attr_dev(input, "maxlength", "12");
     			attr_dev(input, "id", "username");
-    			attr_dev(input, "class", "field svelte-k85ukh");
+    			attr_dev(input, "class", "field svelte-140ttas");
     			attr_dev(input, "placeholder", "Username");
-    			add_location(input, file, 13, 12, 310);
+    			add_location(input, file, 18, 12, 395);
     			attr_dev(button, "id", "btn");
-    			attr_dev(button, "class", "svelte-k85ukh");
-    			add_location(button, file, 14, 12, 410);
-    			attr_dev(div0, "class", "form svelte-k85ukh");
-    			add_location(div0, file, 12, 8, 278);
-    			attr_dev(div1, "class", "left svelte-k85ukh");
-    			add_location(div1, file, 11, 4, 250);
+    			attr_dev(button, "class", "svelte-140ttas");
+    			add_location(button, file, 19, 12, 531);
+    			attr_dev(div0, "class", "form svelte-140ttas");
+    			add_location(div0, file, 17, 8, 363);
+    			attr_dev(div1, "class", "left svelte-140ttas");
+    			add_location(div1, file, 16, 4, 335);
     			attr_dev(img, "id", "rimg");
     			if (!src_url_equal(img.src, img_src_value = "media/login1.png")) attr_dev(img, "src", img_src_value);
     			attr_dev(img, "alt", "");
-    			attr_dev(img, "class", "svelte-k85ukh");
-    			add_location(img, file, 18, 8, 529);
-    			attr_dev(div2, "class", "right svelte-k85ukh");
-    			add_location(div2, file, 17, 4, 500);
-    			attr_dev(div3, "class", "container svelte-k85ukh");
-    			add_location(div3, file, 10, 0, 221);
+    			attr_dev(img, "class", "svelte-140ttas");
+    			add_location(img, file, 23, 8, 650);
+    			attr_dev(div2, "class", "right svelte-140ttas");
+    			add_location(div2, file, 22, 4, 621);
+    			attr_dev(div3, "class", "container svelte-140ttas");
+    			add_location(div3, file, 15, 0, 306);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -20447,7 +17080,11 @@ var app = (function () {
     			append_dev(div2, img);
 
     			if (!mounted) {
-    				dispose = listen_dev(button, "click", /*click_handler*/ ctx[0], false, false, false);
+    				dispose = [
+    					listen_dev(input, "keydown", /*keydown_handler*/ ctx[0], false, false, false),
+    					listen_dev(button, "click", /*click_handler*/ ctx[1], false, false, false)
+    				];
+
     				mounted = true;
     			}
     		},
@@ -20457,7 +17094,7 @@ var app = (function () {
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(div3);
     			mounted = false;
-    			dispose();
+    			run_all(dispose);
     		}
     	};
 
@@ -20478,6 +17115,10 @@ var app = (function () {
     	window.location.href = "/game";
     }
 
+    function pressed(event) {
+    	if (event.key == 'Enter') start();
+    }
+
     function instance$1($$self, $$props, $$invalidate) {
     	let { $$slots: slots = {}, $$scope } = $$props;
     	validate_slots('Login', slots, []);
@@ -20487,9 +17128,13 @@ var app = (function () {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== '$$' && key !== 'slot') console.warn(`<Login> was created with unknown prop '${key}'`);
     	});
 
+    	const keydown_handler = () => {
+    		pressed(event);
+    	};
+
     	const click_handler = () => start();
-    	$$self.$capture_state = () => ({ start });
-    	return [click_handler];
+    	$$self.$capture_state = () => ({ start, pressed });
+    	return [keydown_handler, click_handler];
     }
 
     class Login extends SvelteComponentDev {

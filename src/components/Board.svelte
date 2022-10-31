@@ -33,7 +33,7 @@
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        padding: 5% 0;
+        padding: 2.5% 0;
         border-radius: 20px;
         box-shadow: 0px 0px 20px 3px #afe3d8c4;
     }

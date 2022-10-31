@@ -4,6 +4,11 @@
         sessionStorage.setItem("username", username);
         window.location.href = "/game";
     }
+
+    function pressed(event) {
+        if(event.key == 'Enter') start();
+    }
+
 </script>
 
 
@@ -11,7 +16,7 @@
 <div class="container">
     <div class="left">
         <div class="form">
-            <input type="text" maxlength="12" id="username" class="field" placeholder="Username"/>
+            <input type="text" on:keydown={() => {pressed(event)}} maxlength="12" id="username" class="field" placeholder="Username"/>
             <button id="btn" on:click={() => start()}>Start</button>
         </div>
     </div>
@@ -28,6 +33,7 @@
         height: 100vh;
         display: grid;
         grid-template-columns: 50% 50%;
+        min-width: 1000px;
     }
 
     .left {

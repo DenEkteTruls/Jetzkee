@@ -4,13 +4,13 @@
     import PlayerBar from './components/PlayerBar.svelte';
     import Board from './components/Board.svelte';
     import Overlay from './components/Overlay.svelte';
-    import { bitOrDependencies, sum } from 'mathjs';
-
+    import { not } from 'mathjs';
+    
     $: engine = new Engine(5);
     var username = sessionStorage.getItem("username");
 
 
-    // Skulle gjerne funnet en løsning på dette
+    // Skulle gjerne funnet en bedre løsning på dette
     setInterval(() => {
         engine = engine;
     }, 50);
@@ -36,22 +36,35 @@
     ];
 
     function clicked(title, pot) {
-        for(let i = 0; i < board.length; i++) {
-            if(board[i].title == title) {
-                engine.points_detail[i] += pot;
-                engine.points += pot;
+
+        if(pot == 0) {
+            for(let i = 0; i < board.length; i++) {
+                if(board[i].title == title) {
+                    engine.points_detail[i] = '-';
+                }
+            }
+        } else {
+            for(let i = 0; i < board.length; i++) {
+                if(board[i].title == title) {
+                    engine.points_detail[i] += pot;
+                    engine.points += pot;
+                }
             }
         }
         engine.new_round();
     }
 
     function ferdig() {
+        localStorage.setItem("beste", engine.points);
         engine.done = true;
     }
 </script>
 
 
+
 {#if engine.done} <Overlay {engine}/> {/if}
+
+
 
 <div class="container">
     <div class="left">
@@ -70,8 +83,12 @@
                 {#each board as nice}
                     <tr>
                         <td>{nice.title}</td>
-                        {#if nice.pot && nice.v1 == 0}
-                            <td class="clickable" id={nice.title} on:click={() => {clicked(nice.title, nice.pot)}}>{nice.v1} + {nice.pot}</td>
+                        {#if nice.v1 == 0}
+                            {#if nice.pot}
+                                <td class="clickable" id={nice.title} on:click={() => {clicked(nice.title, nice.pot)}}>{nice.v1} + {nice.pot}</td>
+                            {:else}
+                                <td class="clickable" id={nice.title} on:click={() => {clicked(nice.title, nice.pot)}}>{nice.v1}</td>
+                            {/if}
                         {:else}
                             <td class="not-clickable">{nice.v1}</td>
                         {/if}
@@ -86,7 +103,6 @@
 
 
 
-
 <style>
     .container {
         width: 100vw;
@@ -94,7 +110,7 @@
         display: grid;
         grid-template-columns: 50% 50%;
         background-color: var(--darkgreen);
-        min-width: 920px !important;
+
     }
 
     .right {
@@ -152,7 +168,7 @@
         background-color: var(--yellow);
         border: none;
         border-radius: 15px;
-        color: rgb(0, 0, 0);
+        color: white;
         font-size: 18px;
         font-family: var(--font);
         margin-top: 20px;

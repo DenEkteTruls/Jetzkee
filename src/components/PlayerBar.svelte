@@ -81,6 +81,7 @@
         font-family: var(--font);
         font-size: 16px;
         transition: all .1s ease-in-out;
+        color: white;
     }
 
     #button:hover {

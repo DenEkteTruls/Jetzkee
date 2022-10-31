@@ -1,5 +1,4 @@
 
-
 function sum(array) {
     let a = 0;
     for(let i = 0; i < array.length; i++) {
@@ -7,6 +6,8 @@ function sum(array) {
     }
     return a;
 }
+
+
 
 export class Engine {
     constructor(antall) {
@@ -33,6 +34,12 @@ export class Engine {
         }
     }
 
+    reset() {
+        this.tries_left = 3;
+        this.num = this.antall;
+        this.chosen_list = [];
+    }
+
     new_round() {
         if(this.done) {
             this.dizes = []
@@ -43,10 +50,8 @@ export class Engine {
         }
 
         this.rounds++;
-        this.tries_left = 3;
-        this.num = this.antall;
-        this.chosen_list = [];
 
+        this.reset();
         this.roll_dize();
     }
 
@@ -87,12 +92,13 @@ export class Engine {
         }
 
         if(typeof id == 'string') {
+            let a = this.dizes.concat(this.chosen_list);
             switch (id) {
                 case 'liten': {
                     let checklist = [1, 2, 3, 4, 5];
-                    for(let i = 0; i < this.chosen_list.length; i++) {
+                    for(let i = 0; i < a.length; i++) {
                         for(let x = 0; x < checklist.length; x++) {
-                            if(this.chosen_list[i] == checklist[x]) {
+                            if(a[i] == checklist[x]) {
                                 delete checklist[x];
                                 checklist = checklist.filter(function (a) {
                                     return a != null;
@@ -106,9 +112,9 @@ export class Engine {
 
                 case 'stor': {
                     let checklist = [2, 3, 4, 5, 6];
-                    for(let i = 0; i < this.chosen_list.length; i++) {
+                    for(let i = 0; i < a.length; i++) {
                         for(let x = 0; x < checklist.length; x++) {
-                            if(this.chosen_list[i] == checklist[x]) {
+                            if(a[i] == checklist[x]) {
                                 delete checklist[x];
                                 checklist = checklist.filter(function (a) {
                                     return a != null;
@@ -122,8 +128,8 @@ export class Engine {
 
                 case 'hus': {
                     let counter = [0, 0, 0, 0, 0, 0];
-                    for(let x = 0; x < this.chosen_list.length; x++) {
-                        counter[this.chosen_list[x]-1]++;
+                    for(let x = 0; x < a.length; x++) {
+                        counter[a[x]-1]++;
                     }
                     if(counter.includes(2) && counter.includes(3)) {
                         return (counter.indexOf(2)+1) * 2 + (counter.indexOf(3)+1) * 3
@@ -133,11 +139,11 @@ export class Engine {
                 }
 
                 case 'sjanse': {
-                    return sum(this.chosen_list);
+                    return sum(a);
                 }
 
                 case 'yatzy': {
-                    return (sum(this.chosen_list) == 30) * 50;
+                    return (sum(a) == 30) * 50;
                 }
             }
         }

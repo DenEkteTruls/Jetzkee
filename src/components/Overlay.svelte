@@ -21,6 +21,7 @@
             <p id="points">Poeng: {engine.points}</p>
             <p>Beste: {localStorage.getItem("beste")}</p>
         </div>
+        <button id="restart" on:click="{() => {window.location.href = "/game"}}">RESTART</button>
     </div>
 </div>
 
@@ -41,7 +42,7 @@
 
     .card {
         width: 400px;
-        height: 300px;
+        height: 350px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -54,6 +55,7 @@
     #title {
         font-size: 45px;
         text-align: center;
+        margin-top: 0;
     }
 
     #beste {
@@ -73,6 +75,23 @@
     #logo {
         width: 70%;
         padding-bottom: 25px;
+    }
 
+    #restart {
+        width: 300px;
+        height: 40px;
+        background-color: var(--yellow);
+        border: none;
+        border-radius: 15px;
+        color: white;
+        font-size: 16px;
+        font-family: var(--font);
+        margin-top: 20px;
+        transition: all .1s ease-in-out;
+    }
+
+    #restart:hover {
+        background-color: var(--orange);
+        cursor: pointer;
     }
 </style>
