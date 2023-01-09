@@ -1,6 +1,6 @@
 Jetzkee Yatzee
 
-www.jetzkee2.netlify.app
+https://jetzkee2.netlify.app/
 
 npm i \
 npm i page \
